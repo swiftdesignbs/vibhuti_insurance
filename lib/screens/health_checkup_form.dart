@@ -29,56 +29,77 @@ class _HealthCheckUpFormScreenState extends State<HealthCheckUpFormScreen> {
           child: Column(
             children: [
               CustomTextFieldWithName(
+                keyboardType: TextInputType.number,
                 controller: TextEditingController(),
                 hintText: "Text",
                 ddName: 'Employee Code',
               ),
               CustomTextFieldWithName(
+                keyboardType: TextInputType.text,
+
                 controller: TextEditingController(),
                 hintText: "Text",
                 ddName: 'Employee Name',
               ),
               CustomTextFieldWithName(
+                keyboardType: TextInputType.emailAddress,
+
                 controller: TextEditingController(),
                 hintText: "Text",
                 ddName: 'Email ID',
               ),
               CustomTextFieldWithName(
+                keyboardType: TextInputType.phone,
+
                 controller: TextEditingController(),
                 hintText: "Text",
                 ddName: 'Mobile No.',
               ),
               CustomTextFieldWithName(
+                keyboardType: TextInputType.text,
+
                 controller: TextEditingController(),
                 hintText: "Text",
                 ddName: 'Policy Type',
               ),
               CustomTextFieldWithName(
+                keyboardType: TextInputType.text,
+
                 controller: TextEditingController(),
                 hintText: "Text",
                 ddName: 'Policy No.',
               ),
               CustomTextFieldWithName(
+                keyboardType: TextInputType.text,
+
                 controller: TextEditingController(),
                 hintText: "Text",
                 ddName: 'Patient or Member Name',
               ),
               CustomTextFieldWithName(
+                keyboardType: TextInputType.number,
+
                 controller: TextEditingController(),
                 hintText: "Text",
                 ddName: 'Age',
               ),
               CustomTextFieldWithName(
+                keyboardType: TextInputType.text,
+
                 controller: TextEditingController(),
                 hintText: "Text",
                 ddName: 'Gender',
               ),
               CustomTextFieldWithName(
+                keyboardType: TextInputType.text,
+
                 controller: TextEditingController(),
                 hintText: "Text",
                 ddName: 'Relation',
               ),
               CustomTextFieldWithName(
+                keyboardType: TextInputType.text,
+
                 controller: TextEditingController(),
                 hintText: "Text",
                 ddName: 'Type Of Services',
@@ -158,7 +179,7 @@ class _HealthCheckUpFormScreenState extends State<HealthCheckUpFormScreen> {
               Buttons(
                 onPressed: () {},
                 ddName: "Proceed To Book",
-                height: 45,
+
                 width: double.infinity,
               ),
             ],

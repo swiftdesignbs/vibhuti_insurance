@@ -1,15 +1,12 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/my_policy_screen.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/notification_screen.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/dental_checkup.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/health_check_up.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/profile_screen.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/settings.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/vision_check_up.dart';
+
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
-import 'package:vibhuti_insurance_mobile_app/widgets/base_scaffold.dart';
-import 'package:vibhuti_insurance_mobile_app/widgets/custom_appdrawer.dart';
+import 'package:vibhuti_insurance_mobile_app/widgets/app_bar.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/family_card.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/policy_benefit_card.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/regular_btn.dart';
@@ -28,11 +25,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _currentIndex = 0;
 
   final List<Map<String, dynamic>> carouselIcons = [
-    {"icon": "assets/icons/wellness_8.png", "label": "Health Checkup"},
-    {"icon": "assets/icons/wellness_1.png", "label": "Home Sample Collection"},
-    {"icon": "assets/icons/wellness_5.png", "label": "Dental Checkup"},
-    {"icon": "assets/icons/wellness_4.png", "label": "Vision Checkup"},
-    {"icon": "assets/icons/wellness_3.png", "label": "OPD Benefits"},
+    {
+      "icon": "assets/icons/wellness_8.png",
+      "label": "Health Checkup",
+      "route": HealthCheckUpScreen(),
+    },
+    {
+      "icon": "assets/icons/wellness_1.png",
+      "label": "Home Sample Collection",
+      "route": DentalCheckUpScreen(),
+    },
+    {
+      "icon": "assets/icons/wellness_5.png",
+      "label": "Dental Checkup",
+      "route": HealthCheckUpScreen(),
+    },
+    {
+      "icon": "assets/icons/wellness_4.png",
+      "label": "Vision Checkup",
+      "route": VisionCheckUpScreen(),
+    },
+    {
+      "icon": "assets/icons/wellness_3.png",
+      "label": "OPD Benefits",
+      "route": HealthCheckUpScreen(),
+    },
   ];
 
   final List<Map<String, String>> nameList = [
@@ -40,58 +57,152 @@ class _DashboardScreenState extends State<DashboardScreen> {
     {"label": "Settled"},
     {"label": "Query"},
   ];
-  final List<Map<String, dynamic>> carouselItems = [
-    {
-      "policyNo": "POL123456789",
-      "sumInsured": "₹5,00,000",
-      "covers": "Health,Accidents",
-      "startDate": "01 Jan 2024",
-      "endDate": "31 Dec 2024",
-      "tpa": "MediAssist TPA Pvt. Ltd.",
-    },
-    {
-      "policyNo": "POL987654321",
-      "sumInsured": "₹10,00,000",
-      "covers": "Vehicle Damage",
-      "startDate": "15 Feb 2024",
-      "endDate": "14 Feb 2025",
-      "tpa": "ICICI Lombard TPA",
-    },
-    {
-      "policyNo": "POL654321987",
-      "sumInsured": "₹20,00,000",
-      "covers": "Home Fire",
-      "startDate": "10 Mar 2024",
-      "endDate": "09 Mar 2025",
-      "tpa": "HDFC Ergo TPA",
-    },
-  ];
+
+  void _showDependentBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return FractionallySizedBox(
+          heightFactor: 0.40,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 10,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Dependent', style: AppTextTheme.pageTitle),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          familyCard(
+                            context: context,
+                            iconPath: 'assets/icons/circle-user.png',
+                            title: 'Kumar Sangakara',
+                            subtitle: 'DOB: 19-07-1987',
+                          ),
+                          familyCard(
+                            context: context,
+                            iconPath: 'assets/icons/circle-user.png',
+                            title: 'Sachin Tendulkar',
+                            subtitle: 'DOB: 19-07-1987',
+                          ),
+                          familyCard(
+                            context: context,
+                            iconPath: 'assets/icons/circle-user.png',
+                            title: 'Kumar Sangakara',
+                            subtitle: 'DOB: 19-07-1987',
+                          ),
+                          familyCard(
+                            context: context,
+                            iconPath: 'assets/icons/circle-user.png',
+                            title: 'Sachin Tendulkar',
+                            subtitle: 'DOB: 19-07-1987',
+                          ),
+                          familyCard(
+                            context: context,
+                            iconPath: 'assets/icons/circle-user.png',
+                            title: 'Kumar Sangakara',
+                            subtitle: 'DOB: 19-07-1987',
+                          ),
+                          familyCard(
+                            context: context,
+                            iconPath: 'assets/icons/circle-user.png',
+                            title: 'Sachin Tendulkar',
+                            subtitle: 'DOB: 19-07-1987',
+                          ),
+                          familyCard(
+                            context: context,
+                            iconPath: 'assets/icons/circle-user.png',
+                            title: 'Kumar Sangakara',
+                            subtitle: 'DOB: 19-07-1987',
+                          ),
+                          familyCard(
+                            context: context,
+                            iconPath: 'assets/icons/circle-user.png',
+                            title: 'Sachin Tendulkar',
+                            subtitle: 'DOB: 19-07-1987',
+                          ),
+                          familyCard(
+                            context: context,
+                            iconPath: 'assets/icons/circle-user.png',
+                            title: 'Kumar Sangakara',
+                            subtitle: 'DOB: 19-07-1987',
+                          ),
+                          familyCard(
+                            context: context,
+                            iconPath: 'assets/icons/circle-user.png',
+                            title: 'Sachin Tendulkar',
+                            subtitle: 'DOB: 19-07-1987',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppTextTheme.appBarColor,
-        title: Text("Welcome\nKrishnan Murthy", style: AppTextTheme.pageTitle),
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          onPressed: () {
-            if (widget.scaffoldKey != null) {
-              widget.scaffoldKey!.currentState?.openDrawer();
-            }
-          },
-          icon: Image.asset('assets/icons/menu.png', height: 24, width: 24),
-        ),
+      appBar: AppBarUtils.buildCommonAppBar(
+        context: context,
+        screenTitle: "Dashboard",
+        userName: "Krishnan Murthy",
+        scaffoldKey: widget.scaffoldKey,
+        showWelcomeText: true,
         actions: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CircleAvatar(
-              radius: 28,
-              backgroundColor: Colors.grey.shade200,
-              child: Image.asset(
-                'assets/icons/profile_icon.png',
-                height: 24,
-                width: 24,
+            padding: const EdgeInsets.only(right: 20),
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfileScreen()),
+                );
+              },
+              child: CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Image.asset(
+                  'assets/icons/profile_icon.png',
+                  height: 24,
+                  width: 24,
+                ),
               ),
             ),
           ),
@@ -131,91 +242,137 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
               ),
               SizedBox(height: 10),
-              CarouselSlider(
-                carouselController: CarouselSliderController(),
-                options: CarouselOptions(
-                  height: 140,
-                  enlargeCenterPage: true,
-                  autoPlay: true,
-                  aspectRatio: 16 / 9,
-                  enableInfiniteScroll: true,
-                  autoPlayAnimationDuration: const Duration(milliseconds: 500),
-                  viewportFraction: 1,
-                  clipBehavior: Clip.none, // 👈 allow shadow to overflow
 
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      _currentIndex = index;
-                    });
-                  },
-                ),
-                items: carouselItems.map((item) {
-                  return Container(
-                    // margin: const EdgeInsets.all(
-                    //   8,
-                    // ), // 👈 add a little space to show shadow
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF2D7C78), // darker teal shadow
-                          offset: const Offset(6, 6), // shadow position
-                          blurRadius: 1,
-                        ),
-                      ],
-                      border: Border.all(
-                        color: const Color(0xFF56B3AD),
-                        width: 1.2,
-                      ),
+              // CarouselSlider(
+              //   carouselController: CarouselSliderController(),
+              //   options: CarouselOptions(
+              //     height: 140,
+              //     enlargeCenterPage: true,
+              //     autoPlay: true,
+              //     aspectRatio: 16 / 9,
+              //     enableInfiniteScroll: true,
+              //     autoPlayAnimationDuration: const Duration(milliseconds: 500),
+              //     viewportFraction: 1,
+              //     clipBehavior: Clip.none, // 👈 allow shadow to overflow
+
+              //     onPageChanged: (index, reason) {
+              //       setState(() {
+              //         _currentIndex = index;
+              //       });
+              //     },
+              //   ),
+              //   items: carouselItems.map((item) {
+              //     return
+              //   }).toList(),
+              // ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF2D7C78),
+                      offset: const Offset(6, 6),
+                      blurRadius: 1,
                     ),
+                  ],
+                  border: Border.all(
+                    color: const Color(0xFF56B3AD),
+                    width: 1.2,
+                  ),
+                ),
 
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          height: 45,
-                          decoration: BoxDecoration(
-                            color: AppTextTheme.primaryColor,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(10),
-                              topRight: Radius.circular(10),
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Text(
-                              'Policy No: ${item['policyNo']}',
-                              style: AppTextTheme.buttonText,
-                            ),
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: 45,
+                        decoration: BoxDecoration(
+                          color: AppTextTheme.primaryColor,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            topRight: Radius.circular(10),
                           ),
                         ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Text(
+                            'Policy No: 1234567890',
+                            style: AppTextTheme.buttonText,
+                          ),
+                        ),
+                      ),
 
-                        const SizedBox(height: 10),
+                      const SizedBox(height: 10),
 
-                        // Row 1
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: 'Sum Insured: ',
+                                        style: AppTextTheme.paragraph.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: '₹10,00,000',
+                                        style: AppTextTheme.paragraph,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+
+                                Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: 'Start Date: ',
+                                        style: AppTextTheme.paragraph.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: '15 Feb 2025',
+                                        style: AppTextTheme.paragraph,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
+                              child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text.rich(
                                     TextSpan(
                                       children: [
                                         TextSpan(
-                                          text: 'Sum Insured: ',
+                                          text: 'Covers: ',
                                           style: AppTextTheme.paragraph
                                               .copyWith(
                                                 fontWeight: FontWeight.bold,
                                               ),
                                         ),
                                         TextSpan(
-                                          text: '${item['sumInsured']}',
+                                          text: 'Health Accident',
                                           style: AppTextTheme.paragraph,
                                         ),
                                       ],
@@ -227,14 +384,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     TextSpan(
                                       children: [
                                         TextSpan(
-                                          text: 'Start Date: ',
+                                          text: 'End Date: ',
                                           style: AppTextTheme.paragraph
                                               .copyWith(
                                                 fontWeight: FontWeight.bold,
                                               ),
                                         ),
                                         TextSpan(
-                                          text: '${item['startDate']}',
+                                          text: '14 Feb 2025',
                                           style: AppTextTheme.paragraph,
                                         ),
                                       ],
@@ -242,120 +399,97 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   ),
                                 ],
                               ),
+                            ),
+                          ],
+                        ),
+                      ),
 
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text.rich(
-                                      TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: 'Covers: ',
-                                            style: AppTextTheme.paragraph
-                                                .copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                          ),
-                                          TextSpan(
-                                            text: '${item['covers']}',
-                                            style: AppTextTheme.paragraph,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
+                      const SizedBox(height: 10),
 
-                                    Text.rich(
-                                      TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: 'End Date: ',
-                                            style: AppTextTheme.paragraph
-                                                .copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                          ),
-                                          TextSpan(
-                                            text: '${item['endDate']}',
-                                            style: AppTextTheme.paragraph,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'TPA: ',
+                                style: AppTextTheme.paragraph.copyWith(
+                                  fontWeight: FontWeight.bold,
                                 ),
+                              ),
+                              TextSpan(
+                                text: 'HDFC Ergo TPA',
+                                style: AppTextTheme.paragraph,
                               ),
                             ],
                           ),
                         ),
-
-                        const SizedBox(height: 10),
-
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Text.rich(
-                            TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: 'TPA: ',
-                                  style: AppTextTheme.paragraph.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: '${item['tpa']}',
-                                  style: AppTextTheme.paragraph,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              ),
-
-              const SizedBox(height: 20),
-              Center(
-                child: AnimatedSmoothIndicator(
-                  activeIndex: _currentIndex,
-                  count: carouselItems.length,
-                  effect: ExpandingDotsEffect(
-                    dotWidth: 5,
-                    dotHeight: 5,
-                    dotColor: AppTextTheme.primaryColor,
-                    activeDotColor: Color(0xFF00635F),
-                    paintStyle: PaintingStyle.stroke,
-                    strokeWidth: 5,
+                      ),
+                    ],
                   ),
                 ),
               ),
-              SizedBox(height: 10),
+
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "My Dependent",
+                    style: AppTextTheme.subTitle.copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      _showDependentBottomSheet(context);
+                    },
+                    child: Text(
+                      "View More",
+                      style: AppTextTheme.coloredSubTitle.copyWith(
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              // Center(
+              //   child: AnimatedSmoothIndicator(
+              //     activeIndex: _currentIndex,
+              //     count: carouselItems.length,
+              //     effect: ExpandingDotsEffect(
+              //       dotWidth: 5,
+              //       dotHeight: 5,
+              //       dotColor: AppTextTheme.primaryColor,
+              //       activeDotColor: Color(0xFF00635F),
+              //       paintStyle: PaintingStyle.stroke,
+              //       strokeWidth: 5,
+              //     ),
+              //   ),
+              // ),
+              // SizedBox(height: 10),
               Wrap(
                 spacing: 5, // horizontal space between cards
-                runSpacing: 10, // vertical space between rows
+                runSpacing: 5, // vertical space between rows
                 children: [
                   familyCard(
                     context: context,
                     iconPath: 'assets/icons/circle-user.png',
-                    title: 'John Cena',
+                    title: 'Kumar Sangakara',
                     subtitle: 'DOB: 19-07-1987',
                   ),
                   familyCard(
                     context: context,
                     iconPath: 'assets/icons/circle-user.png',
-                    title: 'John Lenin',
+                    title: 'Sachin Tendulkar',
                     subtitle: 'DOB: 19-07-1987',
                   ),
                 ],
               ),
 
-              SizedBox(height: 20),
+              SizedBox(height: 15),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -440,39 +574,50 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   itemCount: carouselIcons.length,
 
                   itemBuilder: (context, index) {
-                    return Container(
-                      width: MediaQuery.of(context).size.width / 4.5,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(3),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: AppTextTheme.primaryColor,
+                    return InkWell(
+                      onTap: () {
+                        pushScreen(
+                          context,
+                          screen: carouselIcons[index]['route'],
+                          withNavBar: true,
+                          pageTransitionAnimation:
+                              PageTransitionAnimation.cupertino,
+                        );
+                      },
+                      child: Container(
+                        width: MediaQuery.of(context).size.width / 4.5,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(3),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: AppTextTheme.primaryColor,
+                                ),
+                              ),
+                              child: CircleAvatar(
+                                radius: 30,
+                                backgroundColor: Colors.white,
+                                child: Image.asset(
+                                  carouselIcons[index]['icon'],
+                                  height: 30,
+                                  width: 30,
+                                ),
                               ),
                             ),
-                            child: CircleAvatar(
-                              radius: 30,
-                              backgroundColor: Colors.white,
-                              child: Image.asset(
-                                carouselIcons[index]['icon'],
-                                height: 30,
-                                width: 30,
+                            const SizedBox(height: 8),
+                            Text(
+                              carouselIcons[index]['label'],
+                              textAlign: TextAlign.center,
+                              style: AppTextTheme.subItemTitle.copyWith(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12,
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            carouselIcons[index]['label'],
-                            textAlign: TextAlign.center,
-                            style: AppTextTheme.subItemTitle.copyWith(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     );
                   },
@@ -530,19 +675,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 width: 220,
                 height: 220,
 
-                // decoration: BoxDecoration(
-                //   color: const Color(0xFF00635F),
-                //   borderRadius: BorderRadius.circular(12),
-                // ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF00635F),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppTextTheme.primaryColor),
                   boxShadow: [
                     BoxShadow(
-                      color: AppTextTheme.primaryColor, // darker teal shadow
-                      offset: const Offset(10, 8), // shadow position
-                      //blurRadius: 0,
+                      color: AppTextTheme.primaryColor,
+                      offset: const Offset(10, 8),
                     ),
                   ],
                 ),
@@ -572,12 +712,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               SizedBox(height: 20),
-              Buttons(
-                onPressed: () {},
-                ddName: "Coming Soon",
-                height: 45,
-                width: 150,
-              ),
+              Buttons(onPressed: () {}, ddName: "Coming Soon", width: 150),
             ],
           ),
         ),
@@ -586,29 +721,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget actionCard(String title, String iconPath) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        border: Border.all(color: AppTextTheme.primaryColor, width: 1),
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.white,
-      ),
-      child: Row(
-        children: [
-          Image.asset(
-            iconPath,
-            height: 28,
-            width: 28,
-            color: Color(0xff004370),
-          ),
-          const SizedBox(width: 10),
-          Text(
-            title,
-            style: AppTextTheme.subItemTitle.copyWith(
-              fontWeight: FontWeight.w500,
+    return InkWell(
+      onTap: () {},
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          border: Border.all(color: AppTextTheme.primaryColor, width: 1),
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.white,
+        ),
+        child: Row(
+          children: [
+            Image.asset(
+              iconPath,
+              height: 28,
+              width: 28,
+              color: Color(0xff004370),
             ),
-          ),
-        ],
+            const SizedBox(width: 10),
+            Text(
+              title,
+              style: AppTextTheme.subItemTitle.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

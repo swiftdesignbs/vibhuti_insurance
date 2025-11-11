@@ -1,36 +1,761 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/dashboard_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/base_scaffold.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/my_policy_screen.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/notification_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/health_check_up.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/profile_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/settings.dart';
+import 'package:vibhuti_insurance_mobile_app/widgets/custom_input_with_name.dart';
+import 'package:vibhuti_insurance_mobile_app/widgets/family_card.dart';
+import 'package:vibhuti_insurance_mobile_app/widgets/family_card_two.dart';
+import 'package:vibhuti_insurance_mobile_app/widgets/policy_benefit_card.dart';
+import 'package:vibhuti_insurance_mobile_app/widgets/regular_btn.dart';
 
 class ProfileScreen extends StatefulWidget {
-  final GlobalKey<ScaffoldState>? scaffoldKey;
-
-  const ProfileScreen({super.key, this.scaffoldKey});
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  TextEditingController name = TextEditingController();
+  TextEditingController relation = TextEditingController();
+  TextEditingController dob = TextEditingController();
+  TextEditingController doc = TextEditingController();
+  TextEditingController ocupation = TextEditingController();
+  TextEditingController emailId = TextEditingController();
+  TextEditingController mobileNo = TextEditingController();
+
+  final List<Map<String, String>> familyMembers = [
+    {
+      'name': 'Jane Doe',
+      'dob': '21-05-1990',
+      'icon': 'assets/icons/circle-user.png',
+      'dependent': 'Spouse',
+      'doc': '30-09-2024',
+    },
+    {
+      'name': 'Chris Evans',
+      'dob': '09-08-1985',
+      'icon': 'assets/icons/circle-user.png',
+      'dependent': 'Father',
+      'doc': '30-09-2024',
+    },
+  ];
+
+  void _showCalenderBottomSheet(
+    BuildContext context,
+    TextEditingController controller,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        final screenHeight = MediaQuery.of(context).size.height;
+        final sheetHeight = screenHeight > 700 ? 0.7 : 0.85;
+
+        return FractionallySizedBox(
+          heightFactor: sheetHeight,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 10,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Select Date",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Theme(
+                          data: Theme.of(context).copyWith(
+                            colorScheme: ColorScheme.light(
+                              primary: AppTextTheme.primaryColor,
+                              onPrimary: Colors.white,
+                              onSurface: Colors.black87,
+                            ),
+                          ),
+                          child: CalendarDatePicker(
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(1900),
+                            lastDate: DateTime.now(),
+                            onDateChanged: (date) {
+                              final formattedDate =
+                                  "${date.day.toString().padLeft(2, '0')}/"
+                                  "${date.month.toString().padLeft(2, '0')}/"
+                                  "${date.year}";
+
+                              controller.text = formattedDate;
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showOccupationBottomSheet(
+    BuildContext context,
+    TextEditingController controller,
+  ) {
+    final List<String> occupations = [
+      "Software Engineer",
+      "Doctor",
+      "Teacher",
+      "Business Owner",
+      "Accountant",
+      "Architect",
+      "Civil Engineer",
+      "Designer",
+      "Electrician",
+      "Lawyer",
+      "Nurse",
+      "Pharmacist",
+      "Pilot",
+      "Police Officer",
+      "Sales Executive",
+      "Student",
+      "Unemployed",
+      "Other",
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return FractionallySizedBox(
+          heightFactor: 0.7,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 10,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Select Occupation",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: occupations.length,
+                      itemBuilder: (context, index) {
+                        final occupation = occupations[index];
+                        return ListTile(
+                          title: Text(occupation),
+                          onTap: () {
+                            controller.text = occupation;
+
+                            Navigator.pop(context);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showRelationBottomSheet(
+    BuildContext context,
+    TextEditingController controller,
+  ) {
+    final List<String> relations = [
+      "Mother",
+      "Father",
+      "Son",
+      "Daughter",
+      "Sister",
+      "Brother",
+      "Other",
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return FractionallySizedBox(
+          heightFactor: 0.7,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 10,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Select Relation",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+
+                  Expanded(
+                    child: ListView.separated(
+                      separatorBuilder: (context, index) {
+                        return Divider();
+                      },
+                      itemCount: relations.length,
+                      itemBuilder: (context, index) {
+                        final relation = relations[index];
+                        return ListTile(
+                          title: Text(relation),
+                          onTap: () {
+                            controller.text = relation;
+
+                            Navigator.pop(context);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showAddDependentBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return FractionallySizedBox(
+          heightFactor: 0.80,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 10,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Add Dependent', style: AppTextTheme.pageTitle),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close),
+                      ),
+                    ],
+                  ),
+
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 0),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Personal Details',
+                              style: AppTextTheme.pageTitle.copyWith(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            CustomTextFieldWithName(
+                              keyboardType: TextInputType.text,
+
+                              controller: name,
+                              hintText: "Text",
+                              ddName: 'Name',
+                            ),
+                            CustomTextFieldWithName(
+                              controller: relation,
+                              hintText: "Text",
+                              ddName: 'Relation',
+                              suffixIcon: "assets/icons/down_icon.png",
+                              onTap: () {
+                                FocusScope.of(context).unfocus();
+                                _showRelationBottomSheet(context, relation);
+                              },
+                              readOnly: true,
+                            ),
+
+                            CustomTextFieldWithName(
+                              controller: dob,
+                              hintText: "DD/MM/YYYY",
+                              ddName: 'Date of Birth',
+                              readOnly: true,
+                              suffixIcon: "assets/icons/calender.png",
+                              onTap: () {
+                                FocusScope.of(context).unfocus();
+                                _showCalenderBottomSheet(context, dob);
+                              },
+                            ),
+
+                            CustomTextFieldWithName(
+                              readOnly: true,
+                              controller: doc,
+                              hintText: "DD/MM/YYYY",
+                              ddName: 'Date of Coverage',
+                              suffixIcon: "assets/icons/calender.png",
+                              onTap: () {
+                                FocusScope.of(context).unfocus();
+                                _showCalenderBottomSheet(context, doc);
+                              },
+                            ),
+
+                            CustomTextFieldWithName(
+                              controller: ocupation,
+                              hintText: "Select Occupation",
+                              ddName: 'Occupation',
+                              readOnly: true,
+                              suffixIcon: "assets/icons/down_icon.png",
+                              onTap: () {
+                                _showOccupationBottomSheet(context, ocupation);
+                              },
+                            ),
+
+                            Text(
+                              'Contact Details',
+                              style: AppTextTheme.pageTitle.copyWith(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            CustomTextFieldWithName(
+                              keyboardType: TextInputType.emailAddress,
+
+                              controller: emailId,
+                              hintText: "user@email.com",
+                              ddName: 'Email ID',
+                            ),
+                            CustomTextFieldWithName(
+                              keyboardType: TextInputType.phone,
+
+                              controller: mobileNo,
+                              hintText: "+91 98765 43210",
+                              ddName: 'Mobile No.',
+                            ),
+
+                            Text(
+                              'Add Documents',
+                              style: AppTextTheme.pageTitle.copyWith(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            DottedBorder(
+                              options: RoundedRectDottedBorderOptions(
+                                radius: Radius.circular(12),
+                                strokeWidth: 2,
+                                dashPattern: [6, 4],
+                                color: AppTextTheme.primaryColor,
+                              ),
+                              child: Container(
+                                height: 150,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Color(0xFF00B3Ac).withOpacity(0.10),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Image.asset(
+                                      'assets/icons/upload_icon.png',
+                                      width: 60,
+                                      height: 60,
+                                    ),
+                                    SizedBox(width: 12),
+                                    Text(
+                                      'Tap to upload documents',
+                                      style: AppTextTheme.subItemTitle.copyWith(
+                                        color: AppTextTheme.primaryColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                            SizedBox(height: 20),
+                            DottedBorder(
+                              options: RoundedRectDottedBorderOptions(
+                                radius: Radius.circular(50),
+                                strokeWidth: 2,
+                                dashPattern: [6, 4],
+                                color: AppTextTheme.primaryColor,
+                              ),
+                              child: Container(
+                                width: double.infinity,
+                                height: 45,
+                                decoration: BoxDecoration(
+                                  color: Color(0xFF00B3Ac).withOpacity(0.10),
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Image.asset(
+                                          'assets/icons/faq_icon.png',
+                                          color: AppTextTheme.primaryColor,
+                                          width: 60,
+                                          height: 60,
+                                        ),
+
+                                        Text(
+                                          'FAQ Document',
+                                          style: AppTextTheme.subTitle.copyWith(
+                                            color: AppTextTheme.primaryColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Image.asset(
+                                      'assets/icons/trash.png',
+                                      width: 60,
+                                      height: 60,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            Center(
+                              child: Buttons(
+                                onPressed: () {},
+                                ddName: "Save",
+                                width: 360,
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppTextTheme.appBarColor,
-        title: Text("My Policy", style: AppTextTheme.pageTitle),
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          onPressed: () => widget.scaffoldKey?.currentState?.openDrawer(),
-          icon: Image.asset('assets/icons/menu.png', height: 24, width: 24),
+        title: Text("Profile", style: AppTextTheme.pageTitle),
+        iconTheme: const IconThemeData(color: Colors.black),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Personal Details",
+                    style: AppTextTheme.subTitle.copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Image.asset(
+                    'assets/icons/edit_icon.png',
+                    width: 42,
+                    height: 42,
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              employeeInfoCard(context),
+              SizedBox(height: 10),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: familyMembers.length,
+                itemBuilder: (context, index) {
+                  final member = familyMembers[index];
+                  return FamilyCardTwo(
+                    iconPath: member['icon']!,
+                    name: member['name']!,
+                    dob: member['dob']!,
+                    dependent: member['dependent']!,
+                    doc: member['doc']!,
+                  );
+                },
+              ),
+
+              SizedBox(height: 10),
+            ],
+          ),
         ),
       ),
-      body: const Center(
-        child: Text("👤 Profile", style: TextStyle(fontSize: 22)),
+
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        child: Buttons(
+          onPressed: () {
+            _showAddDependentBottomSheet(context);
+          },
+          ddName: "Add Dependent",
+
+          width: double.infinity,
+          iconPath: "assets/icons/add_dependent.png",
+        ),
+      ),
+    );
+  }
+}
+
+Widget employeeInfoCard(BuildContext context) {
+  final screenWidth = MediaQuery.of(context).size.width;
+  final isSmallScreen = screenWidth < 360;
+
+  final items = const [
+    {"title": "Company Name", "description": "ABC Pvt Ltd"},
+    {"title": "Employee Code", "description": "EMP12345"},
+    {"title": "DOB", "description": "01 Jan 1990"},
+    {"title": "Gender", "description": "Male"},
+    {"title": "Email ID", "description": "johndoe@gmail.com"},
+    {"title": "Mobile No.", "description": "980-XXXX-XX90"},
+  ];
+
+  return Container(
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      boxShadow: [
+        BoxShadow(
+          color: const Color(0xFF2D7C78),
+          offset: const Offset(6, 6),
+          blurRadius: 1,
+        ),
+      ],
+      border: Border.all(color: const Color(0xFF56B3AD), width: 1.2),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: double.infinity,
+          height: 45,
+          decoration: BoxDecoration(
+            color: AppTextTheme.primaryColor,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10),
+            ),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Mr John Saxena',
+            style: AppTextTheme.buttonText.copyWith(
+              fontSize: isSmallScreen ? 14 : 16,
+            ),
+          ),
+        ),
+
+        // --- Body Content (2 per row layout) ---
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final itemWidth = (constraints.maxWidth - 16) / 2; // 2 columns
+
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, // 2 items per row
+                  crossAxisSpacing: 16,
+
+                  mainAxisExtent: 60, // Adjust height of each cell
+                ),
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  final item = items[index];
+                  return FeatureItem2(
+                    title: item["title"]!,
+                    description: item["description"]!,
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+class FeatureItem2 extends StatelessWidget {
+  final String title;
+  final String description;
+
+  const FeatureItem2({
+    super.key,
+    required this.title,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      //padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            title,
+            style: AppTextTheme.subTitle.copyWith(
+              color: const Color(0xFF004370),
+              fontWeight: FontWeight.w400,
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            description,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            style: AppTextTheme.subTitle.copyWith(
+              color: const Color(0xFF004370),
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+            ),
+          ),
+        ],
       ),
     );
   }

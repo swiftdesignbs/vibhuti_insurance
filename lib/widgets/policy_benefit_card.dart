@@ -152,20 +152,32 @@ class FeatureTabContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 32,
-      runSpacing: 16,
-      children: const [
-        FeatureItem(title: "Sum Insured", description: "₹10,00,000/- Floater"),
-        FeatureItem(title: "Room Rent", description: "Single Private Room"),
-        FeatureItem(
-          title: "Maternity",
-          description:
-              "Covered from day 1, Normal Delivery and Caesarian Delivery maximum ₹3,00,000/- for first 2 children only.",
+    return Column(
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            FeatureItem(
+              title: "Sum Insured",
+              description: "₹10,00,000/- Floater",
+            ),
+            FeatureItem(title: "Room Rent", description: "Single Private Room"),
+          ],
         ),
-        FeatureItem(
-          title: "Pre-existing diseases/condition",
-          description: "Covered from day 1",
+        SizedBox(height: 10),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            FeatureItem(
+              title: "Maternity",
+              description:
+                  "Covered from day 1, Normal Delivery and Caesarian Delivery maximum ₹3,00,000/- for first 2 children only.",
+            ),
+            FeatureItem(
+              title: "Pre-existing diseases/condition",
+              description: "Covered from day 1",
+            ),
+          ],
         ),
       ],
     );
@@ -180,8 +192,7 @@ class FeatureItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 160,
+    return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

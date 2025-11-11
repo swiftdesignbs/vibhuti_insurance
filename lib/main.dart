@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/booking_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/dashboard_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/main_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/splash_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 import 'package:device_preview_plus/device_preview_plus.dart';
 
@@ -10,7 +12,6 @@ import 'package:device_preview_plus/device_preview_plus.dart';
 // }
 void main() => runApp(
   DevicePreview(
-    enabled: true,
     builder: (context) => MyApp(), // Wrap your app
   ),
 );
@@ -18,7 +19,7 @@ void main() => runApp(
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       // ignore: deprecated_member_use
       useInheritedMediaQuery: true,
       locale: DevicePreview.locale(context),
@@ -86,7 +87,7 @@ class MyApp extends StatelessWidget {
           labelLarge: AppTextTheme.buttonText,
         ),
       ),
-      home: MainScreen(),
+      home: SplashScreen(),
     );
   }
 }

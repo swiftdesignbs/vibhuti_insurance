@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/book_slot_dental_checkup.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/book_slot_health_checkup_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/book_slot_vision_checkup.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/dashboard_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/base_scaffold.dart';
@@ -13,16 +13,16 @@ import 'package:vibhuti_insurance_mobile_app/widgets/custom_input_with_name.dart
 import 'package:vibhuti_insurance_mobile_app/widgets/custom_textfield.dart';
 
 // Dummy Screens (same as before)
-class DentalCheckUpScreen extends StatefulWidget {
+class VisionCheckUpScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState>? scaffoldKey;
 
-  const DentalCheckUpScreen({super.key, this.scaffoldKey});
+  const VisionCheckUpScreen({super.key, this.scaffoldKey});
 
   @override
-  State<DentalCheckUpScreen> createState() => _DentalCheckUpScreenState();
+  State<VisionCheckUpScreen> createState() => _VisionCheckUpScreenState();
 }
 
-class _DentalCheckUpScreenState extends State<DentalCheckUpScreen> {
+class _VisionCheckUpScreenState extends State<VisionCheckUpScreen> {
   TextEditingController searchController = TextEditingController();
   String selectedValue = 'Option 1';
   String selectedGender = 'All';
@@ -33,35 +33,61 @@ class _DentalCheckUpScreenState extends State<DentalCheckUpScreen> {
   final List<Map<String, dynamic>> _allHospitals = [
     {
       "id": '1',
-      "name": '32 Smiles Dental Clinic',
+      "name": 'Kokilaben Dhirubhai Ambani Hospital',
       "address":
-          'Shop No. 12, Green Park Building, Lokhandwala Complex, Andheri West, Mumbai - 400053, Maharashtra, India. Near Versova Metro Station.',
+          'Rao Saheb Achutrao Patwardhan Marg, Four Bungalows, Andheri West, Mumbai - 400053, Maharashtra, India. Near DN Nagar Metro Station.',
+      "latitude": 19.1324,
+      "longitude": 72.8273,
+      "area": 'Andheri West',
+      "phone": '+91-22-3099-9999',
+      "type": 'Multi-Specialty',
     },
     {
       "id": '2',
-      "name": 'Dr. D\'Costa Dental Care',
+      "name": 'Lilavati Hospital and Research Centre',
       "address":
-          'Shop No. 5, Gloria Church Road, Bandra West, Mumbai - 400050, Maharashtra, India. Near Bandra Talkies and Hill Road.',
+          'A-791, Bandra Reclamation, Bandra West, Mumbai - 400050, Maharashtra, India. Opposite MIG Cricket Club, easily accessible from Western Express Highway.',
+      "latitude": 19.0590,
+      "longitude": 72.8229,
+      "area": 'Bandra West',
+      "phone": '+91-22-2675-1000',
+      "type": 'Multi-Specialty',
     },
     {
       "id": '3',
-      "name": 'Smilekraft Dental Clinic',
+      "name": 'Breach Candy Hospital',
       "address":
-          'Ground Floor, Ameya House, Bhulabhai Desai Road, Breach Candy, Mumbai - 400026, Maharashtra, India. Opposite Breach Candy Club.',
+          '60 A, Bhulabhai Desai Road, Breach Candy, Cumballa Hill, Mumbai - 400026, Maharashtra, India. Located near Mahalaxmi Temple and Haji Ali Junction.',
+      "latitude": 18.9661,
+      "longitude": 72.8063,
+      "area": 'Cumballa Hill',
+      "phone": '+91-22-2367-2888',
+      "type": 'Multi-Specialty',
     },
     {
       "id": '4',
-      "name": 'The Dental Studio',
+      "name": 'Bombay Hospital',
       "address":
-          'Shop No. 8, Pearl Center, Marine Lines, Mumbai - 400020, Maharashtra, India. Near Churchgate Station and Marine Drive.',
+          '12, New Marine Lines, Churchgate, Mumbai - 400020, Maharashtra, India. Close to Marine Drive and CST Station, landmark: Liberty Cinema.',
+      "latitude": 18.9439,
+      "longitude": 72.8259,
+      "area": 'Marine Lines',
+      "phone": '+91-22-2206-7676',
+      "type": 'Multi-Specialty',
     },
     {
       "id": '5',
-      "name": 'Bright Smiles Dental Care',
+      "name": 'Jaslok Hospital and Research Centre',
       "address":
-          'G-2, Crystal Plaza, Dr. G. Deshmukh Marg, Pedder Road, Mumbai - 400026, Maharashtra, India. Near Jaslok Hospital.',
+          '15, Dr. G. Deshmukh Marg, Pedder Road, Mumbai - 400026, Maharashtra, India. Near Sophia College and Haji Ali Circle, easily accessible via Worli route.',
+      "latitude": 18.9597,
+      "longitude": 72.8082,
+      "area": 'Pedder Road',
+      "phone": '+91-22-6657-3333',
+      "type": 'Multi-Specialty',
     },
   ];
+
   void _showManuallyBottomSheet(
     BuildContext context,
     TextEditingController controller,
@@ -75,6 +101,8 @@ class _DentalCheckUpScreenState extends State<DentalCheckUpScreen> {
       "Karnataka",
       "Assam",
     ];
+
+
 
     showModalBottomSheet(
       context: context,
@@ -150,7 +178,7 @@ class _DentalCheckUpScreenState extends State<DentalCheckUpScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppTextTheme.appBarColor,
-        title: Text("Dental CheckUp", style: AppTextTheme.pageTitle),
+        title: Text("Vision CheckUp", style: AppTextTheme.pageTitle),
         automaticallyImplyLeading: false,
         leading: IconButton(
           onPressed: () => widget.scaffoldKey?.currentState?.openDrawer(),
@@ -402,7 +430,7 @@ class _DentalCheckUpScreenState extends State<DentalCheckUpScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => BookSlotDentalCheckUpScreen(),
+                            builder: (context) => BookSlotVisionCheckUpScreen(),
                           ),
                         );
                       },

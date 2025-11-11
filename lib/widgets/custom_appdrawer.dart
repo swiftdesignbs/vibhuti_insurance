@@ -17,11 +17,12 @@ class AppDrawer extends StatelessWidget {
       width: MediaQuery.of(context).size.width,
       child: Container(
         color: Colors.white,
-        child: ListView(
-          padding: EdgeInsets.zero,
+        child: Column(
           children: [
+            // ✅ Fixed Header
             Container(
               height: 120,
+              width: double.infinity,
               decoration: BoxDecoration(color: AppTextTheme.appBarColor),
               child: Stack(
                 children: [
@@ -43,23 +44,28 @@ class AppDrawer extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 16),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Welcome',
-                              style: AppTextTheme.pageTitle.copyWith(
-                                fontWeight: FontWeight.w600,
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Welcome',
+                                style: AppTextTheme.pageTitle.copyWith(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                ),
                               ),
-                            ),
-                            Text(
-                              'Krishnan Murthy',
-                              style: AppTextTheme.pageTitle.copyWith(
-                                fontWeight: FontWeight.w600,
+                              Text(
+                                'Krishnan Murthy',
+                                style: AppTextTheme.pageTitle.copyWith(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -82,120 +88,137 @@ class AppDrawer extends StatelessWidget {
               ),
             ),
 
-            _buildSectionHeader('MASTER'),
-            _buildMenuItem(
-              title: 'Dashboard',
-              iconPath: 'assets/icons/dashboard.png',
-              onTap: () {
-                scaffoldKey.currentState?.closeDrawer();
-                if (controller != null) {
-                  controller!.jumpToTab(0);
-                }
-              },
-            ),
-            _buildMenuItem(
-              title: 'My Policy',
-              iconPath: 'assets/icons/policy.png',
-              onTap: () {
-                scaffoldKey.currentState?.closeDrawer();
-                if (controller != null) {
-                  controller!.jumpToTab(1);
-                }
-              },
-            ),
-            _buildMenuItem(
-              title: 'Wellness Services',
-              iconPath: 'assets/icons/wellness.png',
-              onTap: () {
-                scaffoldKey.currentState?.closeDrawer();
+            // ✅ Scrollable Content
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  drwerHeader('MASTER'),
+                  drawerMenuItem(
+                    title: 'Dashboard',
+                    iconPath: 'assets/icons/dashboard.png',
+                    onTap: () => _navigateToTab(0),
+                  ),
+                  drawerMenuItem(
+                    title: 'My Policy',
+                    iconPath: 'assets/icons/policy.png',
+                    onTap: () => _navigateToTab(1),
+                  ),
+                  drawerMenuItem(
+                    title: 'Wellness Services',
+                    iconPath: 'assets/icons/wellness.png',
+                    onTap: () =>
+                        _navigateToScreen(context, WellnessServicesScreen()),
+                  ),
+                  drawerMenuItem(
+                    title: 'Booking List',
+                    iconPath: 'assets/icons/booking_list.png',
+                    onTap: () => _navigateToTab(3),
+                  ),
+                  const SizedBox(height: 16),
 
-                pushScreen(
-                  context,
-                  screen: WellnessServicesScreen(scaffoldKey: scaffoldKey),
-                  withNavBar: true,
-                );
-              },
+                  drwerHeader('TRANSACTION'),
+                  drawerMenuItem(
+                    title: 'Health Claims',
+                    iconPath: 'assets/icons/health_claims.png',
+                    onTap: () {},
+                  ),
+                  drawerMenuItem(
+                    title: 'Other Claims',
+                    iconPath: 'assets/icons/other_Claims.png',
+                    onTap: () {},
+                  ),
+                  drawerMenuItem(
+                    title: 'Claim Query',
+                    iconPath: 'assets/icons/wellness.png',
+                    onTap: () {},
+                  ),
+                  drawerMenuItem(
+                    title: 'TPA Claim Status',
+                    iconPath: 'assets/icons/tpa_claim.png',
+                    onTap: () {},
+                  ),
+                  drawerMenuItem(
+                    title: 'Wallet',
+                    iconPath: 'assets/icons/wallet.png',
+                    onTap: () {},
+                  ),
+                  drawerMenuItem(
+                    title: 'Logout',
+                    iconPath: 'assets/icons/logout_icon.png',
+                    onTap: () => displayLogOutModal(context),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
-            _buildMenuItem(
-              title: 'Booking List',
-              iconPath: 'assets/icons/booking_list.png',
-              onTap: () {
-                scaffoldKey.currentState?.closeDrawer();
-
-                print('Available navigation methods check...');
-
-                try {
-                  pushScreen(
-                    context,
-                    screen: BookingScreen(scaffoldKey: scaffoldKey),
-                    withNavBar: true,
-                  );
-                  print('pushScreen executed successfully');
-                } catch (e) {
-                  print('pushScreen failed: $e');
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          BookingScreen(scaffoldKey: scaffoldKey),
-                    ),
-                  );
-                }
-              },
-            ),
-            const SizedBox(height: 16),
-            _buildSectionHeader('TRANSACTION'),
-            _buildMenuItem(
-              title: 'Health Claims',
-              iconPath: 'assets/icons/health_claims.png',
-              onTap: () {
-                scaffoldKey.currentState?.closeDrawer();
-              },
-            ),
-            _buildMenuItem(
-              title: 'Other Claims',
-              iconPath: 'assets/icons/other_Claims.png',
-              onTap: () {
-                scaffoldKey.currentState?.closeDrawer();
-              },
-            ),
-            _buildMenuItem(
-              title: 'Claim Query',
-              iconPath: 'assets/icons/wellness.png',
-              onTap: () {
-                scaffoldKey.currentState?.closeDrawer();
-              },
-            ),
-            _buildMenuItem(
-              title: 'TPA Claim Status',
-              iconPath: 'assets/icons/tpa_claim.png',
-              onTap: () {
-                scaffoldKey.currentState?.closeDrawer();
-              },
-            ),
-            _buildMenuItem(
-              title: 'Wallet',
-              iconPath: 'assets/icons/wallet.png',
-              onTap: () {
-                scaffoldKey.currentState?.closeDrawer();
-              },
-            ),
-            _buildMenuItem(
-              title: 'Logout',
-              iconPath: 'assets/icons/logout_icon.png',
-              onTap: () {
-                scaffoldKey.currentState?.closeDrawer();
-              },
-            ),
-            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  void _navigateToTab(int index) {
+    scaffoldKey.currentState?.closeDrawer();
+    if (controller != null) {
+      controller!.jumpToTab(index);
+    }
+  }
+
+  // In lib/widgets/custom_appdrawer.dart
+
+  void _navigateToScreen(BuildContext context, Widget screen) {
+    // Close the drawer first
+    scaffoldKey.currentState?.closeDrawer();
+
+    // Add a slight delay to allow the drawer animation to start closing smoothly
+    Future.delayed(const Duration(milliseconds: 250), () {
+      // Use the 'context' passed into this function directly.
+      // The 'pushScreen' function from the package handles the nested navigation logic correctly.
+      pushScreen(
+        context, // Use the provided BuildContext
+        screen: screen,
+        withNavBar: true, // This flag ensures the navbar remains visible
+        pageTransitionAnimation: PageTransitionAnimation.cupertino,
+      );
+    });
+  }
+
+  void displayLogOutModal(BuildContext context) {
+    scaffoldKey.currentState?.closeDrawer();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout', style: AppTextTheme.pageTitle),
+          content: const Text(
+            'Are you sure you want to logout?',
+            style: AppTextTheme.subTitle,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text(
+                'Cancel',
+                style: AppTextTheme.coloredButtonText,
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'Logout',
+                style: AppTextTheme.coloredButtonText,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget drwerHeader(String title) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
       child: Text(
@@ -203,32 +226,38 @@ class AppDrawer extends StatelessWidget {
         style: AppTextTheme.subTitle.copyWith(
           color: Colors.grey.shade600,
           fontWeight: FontWeight.w600,
+          fontSize: 14,
         ),
       ),
     );
   }
 
-  Widget _buildMenuItem({
+  Widget drawerMenuItem({
     required String title,
     required String iconPath,
     required VoidCallback onTap,
   }) {
     return ListTile(
-      leading: Padding(
-        padding: EdgeInsets.only(left: 30),
+      leading: Container(
+        width: 40,
+        height: 40,
+        alignment: Alignment.center,
         child: Image.asset(
           iconPath,
-          height: 30,
-          width: 30,
+          height: 24,
+          width: 24,
           color: const Color(0XFF004370),
         ),
       ),
       title: Text(
         title,
-        style: AppTextTheme.subTitle.copyWith(fontWeight: FontWeight.w500),
+        style: AppTextTheme.subTitle.copyWith(
+          fontWeight: FontWeight.w500,
+          fontSize: 14,
+        ),
       ),
       onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+      // contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       minLeadingWidth: 0,
     );
   }

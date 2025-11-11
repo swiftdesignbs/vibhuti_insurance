@@ -3,10 +3,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/dashboard_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/my_policy_screen.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/notification_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/health_check_up.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/profile_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/settings.dart';
+
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
+import 'package:vibhuti_insurance_mobile_app/widgets/app_bar.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/base_scaffold.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/custom_appdrawer.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/custom_textfield.dart';
@@ -106,9 +108,8 @@ class _BookingScreenState extends State<BookingScreen> {
   ) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled:
-          true, 
-      backgroundColor: Colors.transparent, 
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (context) {
         return FractionallySizedBox(
           heightFactor: 0.85,
@@ -136,7 +137,6 @@ class _BookingScreenState extends State<BookingScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                          
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -148,7 +148,7 @@ class _BookingScreenState extends State<BookingScreen> {
                       ],
                     ),
                     SizedBox(height: 20),
-                          
+
                     detailRow('Employee Name', "Rajesh Kumar"),
                     detailRow('Email ID', "rajesh.kumar@company.com"),
                     detailRow('Mobile No.', "+91 98765 43210"),
@@ -165,14 +165,14 @@ class _BookingScreenState extends State<BookingScreen> {
                       "Sector 23, DLF Phase 3, Gurugram",
                     ),
                     SizedBox(height: 20),
-                          
+
                     detailRow('State', "Haryana"),
                     detailRow('City', "Gurugram"),
                     detailRow('Pincode', "122002"),
                     detailRow('Status', "Confirmed"),
                     detailRow('Booking Date', "10 March 2024"),
                     detailRow('Booking Time', "02:30 PM"),
-                          
+
                     SizedBox(height: 10),
                     Text(
                       "Remarks",
@@ -190,25 +190,27 @@ class _BookingScreenState extends State<BookingScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                          
+
                     //   ShadowBtn(btnName: "Booking Cancel", onTap: () {}),
                     Buttons(
                       onPressed: () {},
                       ddName: "Booking Cancel",
-                      height: 50,
+
                       width: double.infinity,
                     ),
-                          
+
                     const SizedBox(height: 10),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () async {
                           Navigator.pop(context);
-                          await Future.delayed(const Duration(milliseconds: 200));
+                          await Future.delayed(
+                            const Duration(milliseconds: 200),
+                          );
                           _showRescheduleBottomSheet(context, package);
                         },
-                          
+
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
@@ -268,7 +270,7 @@ class _BookingScreenState extends State<BookingScreen> {
                   Buttons(
                     onPressed: () => Navigator.pop(sheetContext),
                     ddName: "Okay",
-                    height: 50,
+
                     width: double.infinity,
                   ),
                 ],
@@ -305,12 +307,10 @@ class _BookingScreenState extends State<BookingScreen> {
               bottom: MediaQuery.of(context).viewInsets.bottom + 20,
             ),
             child: SingleChildScrollView(
-
               child: Column(
-                mainAxisSize: MainAxisSize.min, 
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -334,10 +334,7 @@ class _BookingScreenState extends State<BookingScreen> {
                   CustomTextField(
                     controller: searchController,
                     hintText: "DD/MM/YYYY",
-                    suffixIcon: FaIcon(
-                      FontAwesomeIcons.calendarDays,
-                      color: AppTextTheme.primaryColor,
-                    ),
+                    suffixIcon: "assets/icons/calender.png",
                   ),
                   const SizedBox(height: 16),
 
@@ -349,10 +346,7 @@ class _BookingScreenState extends State<BookingScreen> {
                   CustomTextField(
                     controller: searchController,
                     hintText: "DD/MM/YYYY",
-                    suffixIcon: FaIcon(
-                      FontAwesomeIcons.calendarDays,
-                      color: AppTextTheme.primaryColor,
-                    ),
+                    suffixIcon: "assets/icons/calender.png",
                   ),
                   const SizedBox(height: 16),
 
@@ -371,7 +365,7 @@ class _BookingScreenState extends State<BookingScreen> {
                       _showSuccessBottomSheet(context);
                     },
                     ddName: "Submit",
-                    height: 50,
+
                     width: double.infinity,
                   ),
                 ],
@@ -383,39 +377,31 @@ class _BookingScreenState extends State<BookingScreen> {
     );
   }
 
-  
-  
-  
-  
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppTextTheme.appBarColor,
-        title: Text("Booking", style: AppTextTheme.pageTitle),
-        automaticallyImplyLeading: false,
-
-        leading: IconButton(
-          onPressed: () {
-            if (widget.scaffoldKey != null) {
-              widget.scaffoldKey!.currentState?.openDrawer();
-            } else {
-              Scaffold.of(context).openDrawer();
-            }
-          },
-          icon: Image.asset('assets/icons/menu.png', height: 24, width: 24),
-        ),
+      appBar: AppBarUtils.buildCommonAppBar(
+        context: context,
+        screenTitle: "Booking List",
+        scaffoldKey: widget.scaffoldKey,
+        showWelcomeText: false,
         actions: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CircleAvatar(
-              radius: 28,
-              backgroundColor: Colors.grey.shade200,
-              child: Image.asset(
-                'assets/icons/profile_icon.png',
-                height: 24,
-                width: 24,
+            padding: const EdgeInsets.only(right: 20),
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfileScreen()),
+                );
+              },
+              child: CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Image.asset(
+                  'assets/icons/profile_icon.png',
+                  height: 24,
+                  width: 24,
+                ),
               ),
             ),
           ),
@@ -431,10 +417,7 @@ class _BookingScreenState extends State<BookingScreen> {
               CustomTextField(
                 controller: searchController,
                 hintText: "Search",
-                suffixIcon: FaIcon(
-                  FontAwesomeIcons.magnifyingGlass,
-                  color: AppTextTheme.primaryColor,
-                ),
+                suffixIcon: "assets/icons/search_color.png",
               ),
               ListView.builder(
                 shrinkWrap: true,

@@ -5,139 +5,89 @@ import 'package:vibhuti_insurance_mobile_app/screens/booking_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/dashboard_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/dental_checkup.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/my_policy_screen.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/notification_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/health_check_up.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/profile_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/settings.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/whatsapp_screen.dart';
 
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/custom_appdrawer.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final int initialIndex;
+  const MainScreen({super.key, this.initialIndex = 0});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
+  late final PersistentTabController _controller;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  late PersistentTabController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = PersistentTabController(initialIndex: 0);
+    _controller = PersistentTabController(initialIndex: widget.initialIndex);
   }
 
-  List<PersistentTabConfig> _buildTabs() {
-    return [
-      PersistentTabConfig(
-        screen: DashboardScreen(scaffoldKey: _scaffoldKey),
-        item: ItemConfig(
-          icon: CircleAvatar(
-            radius: 25,
-            backgroundColor: AppTextTheme.primaryColor,
-            child: Image.asset(
-              'assets/icons/nav1.png',
-              height: 40,
-              width: 40,
-              color: Colors.white,
-            ),
-          ),
-          inactiveIcon: Image.asset(
-            'assets/icons/nav1.png',
-            height: 40,
-            width: 40,
-          ),
-          // title: "",
-        ),
-      ),
-      PersistentTabConfig(
-        screen: MyPolicyScreen(scaffoldKey: _scaffoldKey),
-        item: ItemConfig(
-          icon: CircleAvatar(
-            radius: 25,
-            backgroundColor: AppTextTheme.primaryColor,
-            child: Image.asset(
-              'assets/icons/nav2.png',
-              height: 40,
-              width: 40,
-              color: Colors.white,
-            ),
-          ),
-          inactiveIcon: Image.asset(
-            'assets/icons/nav2.png',
-            height: 40,
-            width: 40,
-          ),
-          // title: "",
-        ),
-      ),
-      PersistentTabConfig(
-        screen: NotificationScreen(scaffoldKey: _scaffoldKey),
-        item: ItemConfig(
-          icon: CircleAvatar(
-            radius: 25,
-            backgroundColor: AppTextTheme.primaryColor,
-            child: Image.asset(
-              'assets/icons/nav3.png',
-              height: 40,
-              width: 40,
-              color: Colors.white,
-            ),
-          ),
-          inactiveIcon: Image.asset(
-            'assets/icons/nav3.png',
-            height: 40,
-            width: 40,
-          ),
-          //  title: "",
-        ),
-      ),
-      PersistentTabConfig(
-        screen: DentalCheckUpScreen(scaffoldKey: _scaffoldKey),
-        item: ItemConfig(
-          icon: CircleAvatar(
-            radius: 25,
-            backgroundColor: AppTextTheme.primaryColor,
-            child: Image.asset(
-              'assets/icons/nav4.png',
-              height: 40,
-              width: 40,
-              color: Colors.white,
-            ),
-          ),
-          inactiveIcon: Image.asset(
-            'assets/icons/nav4.png',
-            height: 40,
-            width: 40,
-          ),
-          //  title: "",
-        ),
-      ),
-      PersistentTabConfig(
-        screen: SettingsScreen(scaffoldKey: _scaffoldKey),
-        item: ItemConfig(
-          icon: CircleAvatar(
-            radius: 25,
-            backgroundColor: AppTextTheme.primaryColor,
-            child: Image.asset(
-              'assets/icons/nav5.png',
-              height: 40,
-              width: 40,
-              color: Colors.white,
-            ),
-          ),
-          inactiveIcon: Image.asset(
-            'assets/icons/nav5.png',
-            height: 40,
-            width: 40,
-          ),
-          //  title: "",
-        ),
-      ),
-    ];
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
+
+  List<PersistentTabConfig> tabScreen() => [
+    PersistentTabConfig(
+      screen: DashboardScreen(scaffoldKey: _scaffoldKey),
+      item: ItemConfig(
+        icon: activeIcon('assets/icons/nav1.png'),
+        inactiveIcon: inActiveIcon('assets/icons/nav1.png'),
+        //  title: "Dashboard",
+      ),
+    ),
+    PersistentTabConfig(
+      screen: MyPolicyScreen(scaffoldKey: _scaffoldKey),
+      item: ItemConfig(
+        icon: activeIcon('assets/icons/nav2.png'),
+        inactiveIcon: inActiveIcon('assets/icons/nav2.png'),
+        // title: "My Policy",
+      ),
+    ),
+    PersistentTabConfig(
+      screen: WhatsappScreen(scaffoldKey: _scaffoldKey),
+      item: ItemConfig(
+        icon: activeIcon('assets/icons/nav3.png'),
+        inactiveIcon: inActiveIcon('assets/icons/nav3.png'),
+        //  title: "Notifications",
+      ),
+    ),
+    PersistentTabConfig(
+      screen: BookingScreen(scaffoldKey: _scaffoldKey),
+      item: ItemConfig(
+        icon: activeIcon('assets/icons/nav4.png'),
+        inactiveIcon: inActiveIcon('assets/icons/nav4.png'),
+        //  title: "Booking",
+      ),
+    ),
+    PersistentTabConfig(
+      screen: SettingsScreen(scaffoldKey: _scaffoldKey),
+      item: ItemConfig(
+        icon: activeIcon('assets/icons/nav5.png'),
+        inactiveIcon: inActiveIcon('assets/icons/nav5.png'),
+        //  title: "Settings",
+      ),
+    ),
+  ];
+
+  Widget activeIcon(String asset) => CircleAvatar(
+    radius: 20,
+    backgroundColor: AppTextTheme.primaryColor,
+    child: Image.asset(asset, height: 35, width: 35, color: Colors.white),
+  );
+
+  Widget inActiveIcon(String asset) =>
+      Image.asset(asset, height: 35, width: 35, color: Colors.grey[600]);
 
   @override
   Widget build(BuildContext context) {
@@ -145,33 +95,31 @@ class _MainScreenState extends State<MainScreen> {
       key: _scaffoldKey,
       drawer: AppDrawer(scaffoldKey: _scaffoldKey, controller: _controller),
       body: PersistentTabView(
-        // context,
         controller: _controller,
-        tabs: _buildTabs(),
+        tabs: tabScreen(),
         navBarBuilder: (navBarConfig) => Style1BottomNavBar(
-          height: 70,
           navBarConfig: navBarConfig,
-          navBarDecoration: NavBarDecoration(
-            padding: EdgeInsets.only(top: 10, bottom: 0, left: 0, right: 0),
+          navBarDecoration: const NavBarDecoration(
             color: Colors.white,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(30),
-              topRight: Radius.circular(30),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
             ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black12,
-                blurRadius: 8,
-                offset: const Offset(0, -2),
+                blurRadius: 10,
+                offset: Offset(0, -3),
               ),
             ],
           ),
         ),
-
-        //   backgroundColor: Colors.grey[50],
-        stateManagement: false,
-        hideNavigationBar: false,
+        // Optional: Hide navbar on scroll
+        // handleAndroidBackButton: true,
+        // resizeToAvoidBottomInset: true,
+        stateManagement: true,
         screenTransitionAnimation: const ScreenTransitionAnimation(
+          // animateTabTransition: true,
           curve: Curves.easeInOut,
           duration: Duration(milliseconds: 200),
         ),

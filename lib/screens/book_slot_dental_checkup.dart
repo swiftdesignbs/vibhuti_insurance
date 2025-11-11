@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/health_checkup_form.dart';
+
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
-import 'book_slot_screen.dart'; // make sure you import your BookSlotDentalCheckUpScreen file
+import 'package:vibhuti_insurance_mobile_app/widgets/app_bar.dart';
+import 'book_slot_health_checkup_screen.dart'; // make sure you import your BookSlotDentalCheckUpScreen file
 
 class BookSlotDentalCheckUpScreen extends StatefulWidget {
-  const BookSlotDentalCheckUpScreen({super.key});
+  final GlobalKey<ScaffoldState>? scaffoldKey;
+  const BookSlotDentalCheckUpScreen({super.key, this.scaffoldKey});
 
   @override
   State<BookSlotDentalCheckUpScreen> createState() =>
@@ -85,7 +88,7 @@ class _BookSlotDentalCheckUpScreenState
       backgroundColor: Colors.transparent,
       builder: (context) {
         return FractionallySizedBox(
-          heightFactor: 0.85,
+          heightFactor: 0.65,
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: const BoxDecoration(
@@ -95,66 +98,61 @@ class _BookSlotDentalCheckUpScreenState
                 topRight: Radius.circular(20),
               ),
             ),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("Full Body check Up", style: AppTextTheme.pageTitle),
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close, color: Colors.black),
-                      ),
-                    ],
-                  ),
-              
-                  const SizedBox(height: 10),
-              
-                  buildBulletPoint(
-                    "Physical evaluation (Height, weight, waist-to-hip, blood pressure, pulse)",
-                  ),
-                  buildBulletPoint("KFT (Creatinine, blood urea, uric acid)"),
-                  buildBulletPoint("Thyroid profile (T3 + T4 + TSH)"),
-                  buildBulletPoint("CBC with ESR"),
-                  buildBulletPoint("Treadmill test/2D Echo"),
-                  buildBulletPoint("Fasting blood sugar"),
-                  buildBulletPoint("PSA for male"),
-                  buildBulletPoint("HBA1C"),
-                  buildBulletPoint("Vitamin D total"),
-                  buildBulletPoint("USG"),
-                  buildBulletPoint("Chest X Ray"),
-                  buildBulletPoint(
-                    "Doctor consultation - basic eye & basic dental ",
-                  ),
-              
-                  Text(
-                    "Please Take Note Of The Following Points:",
-                    style: AppTextTheme.subTitle.copyWith(
-                      fontWeight: FontWeight.bold,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Dental Package", style: AppTextTheme.pageTitle),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close, color: Colors.black),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 10),
+
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        buildBulletPoint("Extractions"),
+                        buildBulletPoint("Filling and Repairs"),
+                        buildBulletPoint("Root Canals"),
+                        buildBulletPoint("Sealants"),
+                        buildBulletPoint("Bridges and Implants"),
+
+                        Text(
+                          "Please Take Note Of The Following Points:",
+                          style: AppTextTheme.subTitle.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+
+                        buildBulletPoint(
+                          "If any above treatment is done along with doctor consultation and medicine, then only it is covered under dental treatment.",
+                        ),
+                        buildBulletPoint(
+                          "Only consultation charges and medicine charges are not payable under dental package.",
+                        ),
+                        buildBulletPoint(
+                          "Please inform customer service if you are diabetic or a cardiac patient.",
+                        ),
+                        buildBulletPoint(
+                          "If any above treatment is done along with cleaning and polishing, then is covered under dental treatment.",
+                        ),
+                        buildBulletPoint(
+                          "Only cleaning and polishing is not payable.",
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 8),
-              
-                  buildBulletPoint(
-                    "If any above treatment is done along with doctor consultation and medicine, then only it is covered under dental treatment.",
-                  ),
-                  buildBulletPoint(
-                    "Only consultation charges and medicine charges are not payable under dental package.",
-                  ),
-                  buildBulletPoint(
-                    "Please inform customer service if you are diabetic or a cardiac patient.",
-                  ),
-                  buildBulletPoint(
-                    "If any above treatment is done along with cleaning and polishing, then is covered under dental treatment.",
-                  ),
-                  buildBulletPoint("Only cleaning and polishing is not payable."),
-              
-                  const SizedBox(height: 20),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
@@ -183,16 +181,26 @@ class _BookSlotDentalCheckUpScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppTextTheme.appBarColor,
-        title: Text("Book Slot", style: AppTextTheme.pageTitle),
-        iconTheme: const IconThemeData(color: Colors.black),
+      appBar: AppBarUtils.buildCommonAppBar(
+        context: context,
+        screenTitle: "Book Slot",
+        scaffoldKey: widget.scaffoldKey,
+        showImplyingIcon: true,
+        showWelcomeText: false,
       ),
+      //   appBar: AppBar(
+      //   automaticallyImplyLeading: true,
+      //   backgroundColor: AppTextTheme.appBarColor,
+      //   title: Text("Book Slot", style: AppTextTheme.pageTitle),
+      //   iconTheme: const IconThemeData(color: Colors.black),
+      // ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             ListView.builder(
               shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+
               padding: const EdgeInsets.all(12),
               itemCount: testPackage.length,
               itemBuilder: (context, index) {

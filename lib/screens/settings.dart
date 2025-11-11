@@ -4,7 +4,7 @@ import 'package:vibhuti_insurance_mobile_app/screens/dashboard_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/base_scaffold.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/my_policy_screen.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/notification_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/health_check_up.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/profile_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/settings.dart';
 

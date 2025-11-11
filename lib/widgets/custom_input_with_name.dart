@@ -21,7 +21,7 @@ class CustomTextFieldWithName extends StatelessWidget {
   final TextEditingController controller;
   final String? hintText;
   final String? ddName;
-  final Widget? suffixIcon;
+  final String? suffixIcon;
   final TextInputType? keyboardType;
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
@@ -37,11 +37,8 @@ class CustomTextFieldWithName extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          ddName ?? '',
-          style: AppTextTheme.subItemTitle.copyWith(color: Colors.grey.shade500),
-        ),
-        SizedBox(height: 4),
+        Text(ddName ?? '', style: AppTextTheme.subItemTitle),
+        SizedBox(height: 10),
         Container(
           height: 60,
           child: TextFormField(
@@ -59,14 +56,7 @@ class CustomTextFieldWithName extends StatelessWidget {
             decoration: InputDecoration(
               hintText: hintText,
               suffixIcon: suffixIcon != null
-                  ? Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: SizedBox(
-                        height: 24,
-                        width: 24,
-                        child: Center(child: suffixIcon),
-                      ),
-                    )
+                  ? Image.asset(suffixIcon ?? '', height: 12, width: 12)
                   : null,
               counterText: "",
               contentPadding: const EdgeInsets.symmetric(
@@ -74,7 +64,10 @@ class CustomTextFieldWithName extends StatelessWidget {
                 horizontal: 16,
               ),
               enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: AppTextTheme.primaryColor, width: 1),
+                borderSide: BorderSide(
+                  color: AppTextTheme.primaryColor,
+                  width: 1,
+                ),
                 borderRadius: BorderRadius.circular(25),
               ),
               focusedBorder: OutlineInputBorder(

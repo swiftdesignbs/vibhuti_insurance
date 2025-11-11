@@ -1,15 +1,18 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
+import 'package:vibhuti_insurance_mobile_app/widgets/app_bar.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/custom_textfield.dart';
+import 'package:vibhuti_insurance_mobile_app/widgets/dotted_border_btn.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/family_card.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/regular_btn.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/shadow_btn.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/dashboard_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/base_scaffold.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/my_policy_screen.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/notification_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/health_check_up.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/profile_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/settings.dart';
 
@@ -106,12 +109,11 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
   ) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled:
-          true,  
-      backgroundColor: Colors.transparent,  
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (context) {
         return FractionallySizedBox(
-          heightFactor: 0.85, 
+          heightFactor: 0.85,
           child: Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -181,13 +183,13 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
                             familyCard(
                               context: context,
                               iconPath: 'assets/icons/circle-user.png',
-                              title: 'John Cena',
+                              title: 'Kumar Sangakara',
                               subtitle: 'DOB: 19-07-1987',
                             ),
                             familyCard(
                               context: context,
                               iconPath: 'assets/icons/circle-user.png',
-                              title: 'John Lenin',
+                              title: 'Sachin Tendulkar',
                               subtitle: 'DOB: 19-07-1987',
                             ),
                           ],
@@ -196,11 +198,18 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
                     ),
                     const SizedBox(height: 20),
 
-                    _buildDownloadButton("Health Card"),
+                    //  _buildDownloadButton("Health Card"),
+                    DottedBorderBtn(
+                      label: "Health Card",
+                      iconPath: 'assets/icons/download_green.png',
+                    ),
                     const SizedBox(height: 16),
-                    _buildDownloadButton("Policy Copy"),
+                    // _buildDownloadButton("Policy Copy"),
+                    DottedBorderBtn(
+                      label: "Policy Copy",
+                      iconPath: 'assets/icons/download_green.png',
+                    ),
                     const SizedBox(height: 20),
-
 
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,7 +236,12 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
                     ),
 
                     const SizedBox(height: 20),
-                    _buildDownloadButton("FAQ Document"),
+
+                    //    _buildDownloadButton("FAQ Document"),
+                    DottedBorderBtn(
+                      label: "FAQ Document",
+                      iconPath: 'assets/icons/download_green.png',
+                    ),
                   ],
                 ),
               ),
@@ -238,44 +252,44 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
     );
   }
 
-  Widget _buildDownloadButton(String label) {
-    return DottedBorder(
-      options: RoundedRectDottedBorderOptions(
-        radius: Radius.circular(30),
-        strokeWidth: 2,
-        dashPattern: [6, 4],
-        color: AppTextTheme.primaryColor,
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
+  // Widget _buildDownloadButton(String label) {
+  //   return DottedBorder(
+  //     options: RoundedRectDottedBorderOptions(
+  //       radius: Radius.circular(30),
+  //       strokeWidth: 2,
+  //       dashPattern: [6, 4],
+  //       color: AppTextTheme.primaryColor,
+  //     ),
+  //     child: Container(
+  //       decoration: BoxDecoration(
+  //         borderRadius: BorderRadius.circular(30),
 
-          color: const Color(0xFFE5F8F7),
-        ),
+  //         color: const Color(0xFFE5F8F7),
+  //       ),
 
-        child: Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/icons/download_green.png',
-                height: 42,
-                width: 42,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: AppTextTheme.coloredButtonText.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  //       child: Padding(
+  //         padding: const EdgeInsets.all(4.0),
+  //         child: Row(
+  //           mainAxisAlignment: MainAxisAlignment.center,
+  //           children: [
+  //             Image.asset(
+  //               'assets/icons/download_green.png',
+  //               height: 42,
+  //               width: 42,
+  //             ),
+  //             const SizedBox(width: 8),
+  //             Text(
+  //               label,
+  //               style: AppTextTheme.coloredButtonText.copyWith(
+  //                 fontWeight: FontWeight.w500,
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget buildBulletPoint(String text) {
     return Padding(
@@ -303,74 +317,103 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
     );
   }
 
-  final List<String> _filters = ['Health', 'Life', 'Motor', 'Travel'];
+  String selectedFilter = '';
+
+  final List<String> _filters = [
+    'Health',
+    'Life',
+    'Motor',
+    'Travel',
+    'Home',
+    'Accident',
+    'Fire',
+    'Marine',
+    'Property',
+    'Critical Illness',
+    'Pet',
+    'Cyber',
+    'Crop',
+    'Term',
+    'Group Health',
+    'Personal Accident',
+  ];
   String? _selectedFilter;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppTextTheme.appBarColor,
-        title: Text(
-          "My Policy",
-          style: AppTextTheme.pageTitle,
-        ),
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          onPressed: () => widget.scaffoldKey?.currentState?.openDrawer(),
-          icon: Image.asset(
-            'assets/icons/menu.png',
-            height: 24,
-            width: 24,
+      appBar: AppBarUtils.buildCommonAppBar(
+        context: context,
+        screenTitle: "My Policy",
+        scaffoldKey: widget.scaffoldKey,
+        showWelcomeText: false,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfileScreen()),
+                );
+              },
+              child: CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Image.asset(
+                  'assets/icons/profile_icon.png',
+                  height: 24,
+                  width: 24,
+                ),
+              ),
+            ),
           ),
-        ),
+        ],
       ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
             children: [
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: _filters.map((filter) {
-                  final bool isSelected = _selectedFilter == filter;
-                  return ChoiceChip(
-                    label: Text(
-                      filter,
-                      style: TextStyle(
-                        color: isSelected
-                            ? Colors.white
-                            : const Color(0xFF00635F),
-                        fontWeight: FontWeight.w500,
+              SizedBox(
+                height: 45,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _filters.length,
+                  itemBuilder: (context, index) {
+                    final filter = _filters[index];
+                    final isSelected = selectedFilter == filter;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      child: ChoiceChip(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        label: Text(
+                          filter,
+                          style: TextStyle(
+                            color: isSelected ? Colors.white : Colors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        selected: isSelected,
+                        selectedColor: AppTextTheme.primaryColor,
+                        backgroundColor: Colors.white,
+                        side: BorderSide(color: AppTextTheme.primaryColor),
+                        onSelected: (bool selected) {
+                          setState(() {
+                            selectedFilter = selected ? filter : '';
+                          });
+                        },
                       ),
-                    ),
-                    selected: isSelected,
-                    selectedColor: AppTextTheme.primaryColor, 
-                    backgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                      side: BorderSide(
-                        color: isSelected
-                            ? Colors.white
-                            : AppTextTheme.primaryColor,
-                      ),
-                    ),
-                    onSelected: (selected) {
-                      setState(() {
-                        _selectedFilter = selected ? filter : null;
-                      });
-                    },
-                  );
-                }).toList(),
+                    );
+                  },
+                ),
               ),
+
               SizedBox(height: 15),
               CustomTextField(
                 controller: searchController,
                 hintText: "Search",
-                suffixIcon: FaIcon(
-                  FontAwesomeIcons.magnifyingGlass,
-                  color: AppTextTheme.primaryColor,
-                ),
+                suffixIcon: "assets/icons/search_color.png",
               ),
               Expanded(
                 child: ListView.builder(
@@ -430,44 +473,49 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
                                 ],
                               ),
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 13,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
 
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade200,
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade200,
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
 
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      '${package['checkup_name']}',
-                                      style: AppTextTheme.paragraph.copyWith(
-                                        color: AppTextTheme.primaryColor,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        '${package['checkup_name']}',
+                                        style: AppTextTheme.paragraph.copyWith(
+                                          color: AppTextTheme.primaryColor,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                SizedBox(width: 10),
+                                  SizedBox(width: 10),
 
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade200,
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      '1234567890',
-                                      style: AppTextTheme.paragraph.copyWith(
-                                        color: AppTextTheme.primaryColor,
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade200,
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        '1234567890',
+                                        style: AppTextTheme.paragraph.copyWith(
+                                          color: AppTextTheme.primaryColor,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                             Spacer(),
                             InkWell(
