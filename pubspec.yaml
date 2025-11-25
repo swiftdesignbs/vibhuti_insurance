@@ -38,13 +38,20 @@ dependencies:
   carousel_slider: ^5.1.1
   smooth_page_indicator: ^1.2.1
   dotted_border: ^3.1.0
-  persistent_bottom_nav_bar_v2:
+  persistent_bottom_nav_bar: ^6.2.1
   device_preview_plus: ^2.5.0
   http: ^1.5.0
   encrypt: ^5.0.3
   get: ^4.7.2
   pinput: ^5.0.2
-
+  auto_size_text: ^3.0.0
+  fluttertoast: ^9.0.0
+  toast: ^0.3.0
+  flutter_secure_storage: ^9.2.4
+  table_calendar: ^3.0.9
+  autocomplete_textfield: ^2.0.1
+  flutter_svg: ^2.2.3
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -7,14 +7,14 @@ import 'package:vibhuti_insurance_mobile_app/screens/splash_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 import 'package:device_preview_plus/device_preview_plus.dart';
 
-// void main() {
-//   runApp(MyApp());
-// }
-void main() => runApp(
-  DevicePreview(
-    builder: (context) => MyApp(), // Wrap your app
-  ),
-);
+void main() {
+  runApp(MyApp());
+}
+// void main() => runApp(
+//   DevicePreview(
+//     builder: (context) => MyApp(), // Wrap your app
+//   ),
+// );
 
 class MyApp extends StatelessWidget {
   @override
@@ -49,7 +49,6 @@ class MyApp extends StatelessWidget {
           foregroundColor: Colors.white,
         ),
 
-        // Elevated Button Theme
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF00B3AC),
@@ -61,14 +60,12 @@ class MyApp extends StatelessWidget {
           ),
         ),
 
-        // Text Selection Theme
         textSelectionTheme: const TextSelectionThemeData(
           cursorColor: Color(0xFF00B3AC),
           selectionColor: Color(0x3300B3AC),
           selectionHandleColor: Color(0xFF00B3AC),
         ),
 
-        // Input Decoration Theme
         inputDecorationTheme: InputDecorationTheme(
           focusedBorder: OutlineInputBorder(
             borderSide: const BorderSide(color: Color(0xFF00B3AC)),

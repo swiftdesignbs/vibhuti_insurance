@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 
 class AppBarUtils {
@@ -47,7 +48,11 @@ class AppBarUtils {
               onPressed: () {
                 scaffoldKey.currentState?.openDrawer();
               },
-              icon: Image.asset('assets/icons/menu.png', height: 24, width: 24),
+              icon: SvgPicture.asset(
+                'assets/icons/menu.svg',
+                height: 16,
+                width: 16,
+              ),
             )
           : null,
       actions: actions,

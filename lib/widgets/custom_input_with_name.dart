@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 
 class CustomTextFieldWithName extends StatelessWidget {
@@ -13,6 +14,8 @@ class CustomTextFieldWithName extends StatelessWidget {
     this.validator,
     this.onChanged,
     this.readOnly = false,
+    this.enabled = true, // ✅ add this line
+
     this.maxLength,
     this.inputFormatters,
     this.onTap,
@@ -26,6 +29,8 @@ class CustomTextFieldWithName extends StatelessWidget {
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
   final bool readOnly;
+  final bool enabled; // ✅ add this line
+
   final int? maxLength;
   final List<TextInputFormatter>? inputFormatters;
   final VoidCallback? onTap;
@@ -38,15 +43,17 @@ class CustomTextFieldWithName extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(ddName ?? '', style: AppTextTheme.subItemTitle),
-        SizedBox(height: 10),
+        SizedBox(height: 5),
         Container(
-          height: 60,
+          height: 50,
           child: TextFormField(
             controller: controller,
             validator: validator,
             onChanged: onChanged,
             onTap: onTap,
             readOnly: readOnly,
+            enabled: enabled,
+
             keyboardType: keyboardType ?? TextInputType.text,
             maxLength: maxLength,
             inputFormatters: inputFormatters,
@@ -56,7 +63,13 @@ class CustomTextFieldWithName extends StatelessWidget {
             decoration: InputDecoration(
               hintText: hintText,
               suffixIcon: suffixIcon != null
-                  ? Image.asset(suffixIcon ?? '', height: 12, width: 12)
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 14,
+                      ),
+                      child: SvgPicture.asset(suffixIcon!, height: 8, width: 8),
+                    )
                   : null,
               counterText: "",
               contentPadding: const EdgeInsets.symmetric(

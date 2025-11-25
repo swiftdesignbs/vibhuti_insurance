@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
 import 'package:vibhuti_insurance_mobile_app/screens/booking_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/claim_history.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/dashboard_screen.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/dental_checkup.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/my_policy_screen.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/health_check_up.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/profile_screen.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/settings.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/notification.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/whatsapp_screen.dart';
 
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
@@ -22,7 +21,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  late final PersistentTabController _controller;
+  late PersistentTabController _controller;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -31,98 +30,93 @@ class _MainScreenState extends State<MainScreen> {
     _controller = PersistentTabController(initialIndex: widget.initialIndex);
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  List<Widget> _buildScreens() {
+    return [
+      DashboardScreen(scaffoldKey: _scaffoldKey),
+      MyPolicyScreen(scaffoldKey: _scaffoldKey),
+      WhatsappScreen(scaffoldKey: _scaffoldKey),
+      ClaimHistoryScreen(scaffoldKey: _scaffoldKey),
+      NotificationScreen(scaffoldKey: _scaffoldKey),
+      // 👈 Replaced here
+    ];
   }
 
-  List<PersistentTabConfig> tabScreen() => [
-    PersistentTabConfig(
-      screen: DashboardScreen(scaffoldKey: _scaffoldKey),
-      item: ItemConfig(
-        icon: activeIcon('assets/icons/nav1.png'),
-        inactiveIcon: inActiveIcon('assets/icons/nav1.png'),
-        //  title: "Dashboard",
+  List<PersistentBottomNavBarItem> _navBarsItems() {
+    return [
+      PersistentBottomNavBarItem(
+        icon: activeIcon('assets/icons/nav1.svg'),
+        inactiveIcon: inActiveIcon('assets/icons/nav1.svg'),
       ),
-    ),
-    PersistentTabConfig(
-      screen: MyPolicyScreen(scaffoldKey: _scaffoldKey),
-      item: ItemConfig(
-        icon: activeIcon('assets/icons/nav2.png'),
-        inactiveIcon: inActiveIcon('assets/icons/nav2.png'),
-        // title: "My Policy",
+      PersistentBottomNavBarItem(
+        icon: activeIcon('assets/icons/nav2.svg'),
+        inactiveIcon: inActiveIcon('assets/icons/nav2.svg'),
       ),
-    ),
-    PersistentTabConfig(
-      screen: WhatsappScreen(scaffoldKey: _scaffoldKey),
-      item: ItemConfig(
-        icon: activeIcon('assets/icons/nav3.png'),
-        inactiveIcon: inActiveIcon('assets/icons/nav3.png'),
-        //  title: "Notifications",
+      PersistentBottomNavBarItem(
+        icon: activeIcon('assets/icons/nav3.svg'),
+        inactiveIcon: inActiveIcon('assets/icons/nav3.svg'),
       ),
-    ),
-    PersistentTabConfig(
-      screen: BookingScreen(scaffoldKey: _scaffoldKey),
-      item: ItemConfig(
-        icon: activeIcon('assets/icons/nav4.png'),
-        inactiveIcon: inActiveIcon('assets/icons/nav4.png'),
-        //  title: "Booking",
+      PersistentBottomNavBarItem(
+        icon: activeIcon('assets/icons/nav4.svg'),
+        inactiveIcon: inActiveIcon('assets/icons/nav4.svg'),
       ),
-    ),
-    PersistentTabConfig(
-      screen: SettingsScreen(scaffoldKey: _scaffoldKey),
-      item: ItemConfig(
-        icon: activeIcon('assets/icons/nav5.png'),
-        inactiveIcon: inActiveIcon('assets/icons/nav5.png'),
-        //  title: "Settings",
+      PersistentBottomNavBarItem(
+        icon: activeIcon('assets/icons/nav5.svg'),
+        inactiveIcon: inActiveIcon('assets/icons/nav5.svg'),
       ),
-    ),
-  ];
+    ];
+  }
 
-  Widget activeIcon(String asset) => CircleAvatar(
-    radius: 20,
-    backgroundColor: AppTextTheme.primaryColor,
-    child: Image.asset(asset, height: 35, width: 35, color: Colors.white),
+  Widget activeIcon(String asset) => Container(
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      boxShadow: [
+        BoxShadow(
+          color: Color(0XFF00635F),
+          offset: const Offset(4, 4), // X, Y offset
+          blurRadius: 0, // No blur
+          spreadRadius: 0,
+        ),
+      ],
+    ),
+    child: CircleAvatar(
+      radius: 20,
+      backgroundColor: AppTextTheme.primaryColor,
+      child: SvgPicture.asset(asset, height: 24, width: 24, color: Colors.white),
+    ),
   );
 
   Widget inActiveIcon(String asset) =>
-      Image.asset(asset, height: 35, width: 35, color: Colors.grey[600]);
+      SvgPicture.asset(asset, height: 24, width: 24);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: AppDrawer(scaffoldKey: _scaffoldKey, controller: _controller),
-      body: PersistentTabView(
+      drawer: AppDrawer(
+        scaffoldKey: _scaffoldKey,
         controller: _controller,
-        tabs: tabScreen(),
-        navBarBuilder: (navBarConfig) => Style1BottomNavBar(
-          navBarConfig: navBarConfig,
-          navBarDecoration: const NavBarDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 10,
-                offset: Offset(0, -3),
-              ),
-            ],
+        parentContext: context,
+      ),
+      backgroundColor: Colors.white,
+      body: PersistentTabView(
+        context,
+        controller: _controller,
+        screens: _buildScreens(),
+        items: _navBarsItems(),
+        backgroundColor: Colors.white,
+        decoration: const NavBarDecoration(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
+          colorBehindNavBar: Colors.white,
         ),
-        // Optional: Hide navbar on scroll
-        // handleAndroidBackButton: true,
-        // resizeToAvoidBottomInset: true,
-        stateManagement: true,
-        screenTransitionAnimation: const ScreenTransitionAnimation(
-          // animateTabTransition: true,
-          curve: Curves.easeInOut,
-          duration: Duration(milliseconds: 200),
-        ),
+        navBarStyle: NavBarStyle.style6, // similar to your style1 layout
+        // screenTransitionAnimation: const ScreenTransitionAnimation(
+        //   animateTabTransition: true,
+        //   curve: Curves.easeInOut,
+        //   duration: Duration(milliseconds: 200),
+        // ),
       ),
     );
   }

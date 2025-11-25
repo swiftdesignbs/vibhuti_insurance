@@ -1,15 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
+
 import 'package:vibhuti_insurance_mobile_app/screens/booking_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/claim_history.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/dashboard_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/health_claims.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/login_selection.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/wellness_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 
 class AppDrawer extends StatelessWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
   final PersistentTabController? controller;
+  final BuildContext parentContext; // 👈 Add this
 
-  const AppDrawer({super.key, required this.scaffoldKey, this.controller});
+  const AppDrawer({
+    super.key,
+    required this.scaffoldKey,
+    this.controller,
+    required this.parentContext, // 👈 Required
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +45,26 @@ class AppDrawer extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        CircleAvatar(
-                          radius: 28,
-                          backgroundColor: Colors.grey.shade200,
-                          child: Image.asset(
-                            'assets/icons/profile_icon.png',
-                            height: 24,
-                            width: 24,
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                offset: const Offset(4, 4), // X, Y offset
+                                blurRadius: 0, // No blur
+                                spreadRadius: 0,
+                              ),
+                            ],
+                          ),
+                          child: CircleAvatar(
+                            radius: 20,
+                            backgroundColor: Colors.grey.shade200,
+                            child: SvgPicture.asset(
+                              'assets/icons/profile_icon.svg',
+                              height: 24,
+                              width: 24,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -71,15 +95,15 @@ class AppDrawer extends StatelessWidget {
                     ),
                   ),
                   Positioned(
-                    top: 50,
-                    right: 20,
+                    top: 60,
+                    right: 10,
                     child: IconButton(
                       onPressed: () {
                         scaffoldKey.currentState?.closeDrawer();
                       },
                       icon: const Icon(
                         Icons.close,
-                        size: 28,
+                        size: 24,
                         color: Color(0XFF004370),
                       ),
                     ),
@@ -96,56 +120,92 @@ class AppDrawer extends StatelessWidget {
                   drwerHeader('MASTER'),
                   drawerMenuItem(
                     title: 'Dashboard',
-                    iconPath: 'assets/icons/dashboard.png',
+                    iconPath: 'assets/icons/dashboard.svg',
                     onTap: () => _navigateToTab(0),
+                    iconColor: Color(0XFF004370),
                   ),
                   drawerMenuItem(
                     title: 'My Policy',
-                    iconPath: 'assets/icons/policy.png',
+                    iconPath: 'assets/icons/policy.svg',
                     onTap: () => _navigateToTab(1),
                   ),
                   drawerMenuItem(
                     title: 'Wellness Services',
-                    iconPath: 'assets/icons/wellness.png',
-                    onTap: () =>
-                        _navigateToScreen(context, WellnessServicesScreen()),
+                    iconPath: 'assets/icons/wellness.svg',
+                    onTap: () {
+                      scaffoldKey.currentState?.closeDrawer();
+
+                      Future.delayed(const Duration(milliseconds: 250), () {
+                        PersistentNavBarNavigator.pushNewScreen(
+                          parentContext, // 👈 use main screen context
+                          screen: WellnessServicesScreen(
+                            scaffoldKey: GlobalKey<ScaffoldState>(),
+                          ),
+                          withNavBar: true, // ✅ keeps navbar visible
+                          pageTransitionAnimation:
+                              PageTransitionAnimation.cupertino,
+                        );
+                      });
+                    },
                   ),
                   drawerMenuItem(
                     title: 'Booking List',
-                    iconPath: 'assets/icons/booking_list.png',
-                    onTap: () => _navigateToTab(3),
+                    iconPath: 'assets/icons/booking_list.svg',
+                    onTap: () {
+                      scaffoldKey.currentState?.closeDrawer();
+
+                      Future.delayed(const Duration(milliseconds: 250), () {
+                        PersistentNavBarNavigator.pushNewScreen(
+                          parentContext,
+                          screen: BookingScreen(
+                            scaffoldKey: GlobalKey<ScaffoldState>(),
+                          ),
+                          withNavBar: true,
+                          pageTransitionAnimation:
+                              PageTransitionAnimation.cupertino,
+                        );
+                      });
+                    },
                   ),
-                  const SizedBox(height: 16),
 
                   drwerHeader('TRANSACTION'),
                   drawerMenuItem(
                     title: 'Health Claims',
-                    iconPath: 'assets/icons/health_claims.png',
-                    onTap: () {},
+                    iconPath: 'assets/icons/health_claims.svg',
+                    onTap: () {
+                      scaffoldKey.currentState?.closeDrawer();
+
+                      Future.delayed(const Duration(milliseconds: 250), () {
+                        PersistentNavBarNavigator.pushNewScreen(
+                          parentContext, // 👈 use main screen context
+                          screen: HealthClaims(
+                            scaffoldKey: GlobalKey<ScaffoldState>(),
+                          ),
+                          withNavBar: true, // ✅ keeps navbar visible
+                          pageTransitionAnimation:
+                              PageTransitionAnimation.cupertino,
+                        );
+                      });
+                    },
                   ),
+
                   drawerMenuItem(
-                    title: 'Other Claims',
-                    iconPath: 'assets/icons/other_Claims.png',
-                    onTap: () {},
-                  ),
-                  drawerMenuItem(
-                    title: 'Claim Query',
-                    iconPath: 'assets/icons/wellness.png',
-                    onTap: () {},
-                  ),
-                  drawerMenuItem(
-                    title: 'TPA Claim Status',
-                    iconPath: 'assets/icons/tpa_claim.png',
-                    onTap: () {},
+                    title: 'Claim History',
+                    iconPath: 'assets/icons/tpa_claim.svg',
+                    onTap: () {
+                      _navigateToTab(3);
+                    },
                   ),
                   drawerMenuItem(
                     title: 'Wallet',
-                    iconPath: 'assets/icons/wallet.png',
+                    iconPath: 'assets/icons/wallet.svg',
                     onTap: () {},
                   ),
+                  SizedBox(height: 20),
                   drawerMenuItem(
                     title: 'Logout',
-                    iconPath: 'assets/icons/logout_icon.png',
+                    textColor: Color(0XFFFF4242),
+                    iconPath: 'assets/icons/logout_icon.svg',
                     onTap: () => displayLogOutModal(context),
                   ),
                   const SizedBox(height: 20),
@@ -165,25 +225,6 @@ class AppDrawer extends StatelessWidget {
     }
   }
 
-  // In lib/widgets/custom_appdrawer.dart
-
-  void _navigateToScreen(BuildContext context, Widget screen) {
-    // Close the drawer first
-    scaffoldKey.currentState?.closeDrawer();
-
-    // Add a slight delay to allow the drawer animation to start closing smoothly
-    Future.delayed(const Duration(milliseconds: 250), () {
-      // Use the 'context' passed into this function directly.
-      // The 'pushScreen' function from the package handles the nested navigation logic correctly.
-      pushScreen(
-        context, // Use the provided BuildContext
-        screen: screen,
-        withNavBar: true, // This flag ensures the navbar remains visible
-        pageTransitionAnimation: PageTransitionAnimation.cupertino,
-      );
-    });
-  }
-
   void displayLogOutModal(BuildContext context) {
     scaffoldKey.currentState?.closeDrawer();
     showDialog(
@@ -197,7 +238,9 @@ class AppDrawer extends StatelessWidget {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
               child: const Text(
                 'Cancel',
                 style: AppTextTheme.coloredButtonText,
@@ -206,10 +249,16 @@ class AppDrawer extends StatelessWidget {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginSelection()),
+                );
               },
-              child: const Text(
+              child: Text(
                 'Logout',
-                style: AppTextTheme.coloredButtonText,
+                style: AppTextTheme.coloredButtonText.copyWith(
+                  color: Color(0XFFFF4242),
+                ),
               ),
             ),
           ],
@@ -236,29 +285,38 @@ class AppDrawer extends StatelessWidget {
     required String title,
     required String iconPath,
     required VoidCallback onTap,
+    Color? iconColor, // optional
+    Color? textColor,
   }) {
-    return ListTile(
-      leading: Container(
-        width: 40,
-        height: 40,
-        alignment: Alignment.center,
-        child: Image.asset(
-          iconPath,
-          height: 24,
-          width: 24,
-          color: const Color(0XFF004370),
-        ),
-      ),
-      title: Text(
-        title,
-        style: AppTextTheme.subTitle.copyWith(
-          fontWeight: FontWeight.w500,
-          fontSize: 14,
-        ),
-      ),
+    return InkWell(
       onTap: onTap,
-      // contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      minLeadingWidth: 0,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 40, bottom: 2),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 50,
+              alignment: Alignment.center,
+              child: SvgPicture.asset(
+                iconPath,
+                height: 20,
+                width: 20,
+                color: iconColor,
+                //color: const Color(0XFF004370),
+              ),
+            ),
+            Text(
+              title,
+              style: AppTextTheme.subTitle.copyWith(
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                color: textColor,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

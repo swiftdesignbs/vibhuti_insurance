@@ -1,12 +1,18 @@
+import 'dart:ui';
+
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
+import 'package:table_calendar/table_calendar.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/dashboard_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/state_management/state_management.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/base_scaffold.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/my_policy_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/health_check_up.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/profile_screen.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/settings.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/notification.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/custom_input_with_name.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/family_card.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/family_card_two.dart';
@@ -28,111 +34,132 @@ class _ProfileScreenState extends State<ProfileScreen> {
   TextEditingController ocupation = TextEditingController();
   TextEditingController emailId = TextEditingController();
   TextEditingController mobileNo = TextEditingController();
+  final controllers = Get.put(StateController());
 
   final List<Map<String, String>> familyMembers = [
     {
       'name': 'Jane Doe',
       'dob': '21-05-1990',
-      'icon': 'assets/icons/circle-user.png',
+      'icon': 'assets/icons/circle-user.svg',
       'dependent': 'Spouse',
       'doc': '30-09-2024',
     },
     {
       'name': 'Chris Evans',
       'dob': '09-08-1985',
-      'icon': 'assets/icons/circle-user.png',
+      'icon': 'assets/icons/circle-user.svg',
       'dependent': 'Father',
       'doc': '30-09-2024',
     },
   ];
 
-  void _showCalenderBottomSheet(
+  Future<String?> _showCalenderBottomSheet(
     BuildContext context,
-    TextEditingController controller,
-  ) {
-    showModalBottomSheet(
+    TextEditingController textEditingController,
+  ) async {
+    return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
         final screenHeight = MediaQuery.of(context).size.height;
-        final sheetHeight = screenHeight > 700 ? 0.7 : 0.85;
+        final sheetHeight = screenHeight > 700 ? 0.8 : 0.95;
 
-        return FractionallySizedBox(
-          heightFactor: sheetHeight,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 10,
-                  spreadRadius: 2,
+        int selectedYear = DateTime.now().year;
+        int selectedTab = 0; // 0 = Calendar, 1 = Filter
+
+        List<int> years = List.generate(25, (i) => DateTime.now().year - i);
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Stack(
+              children: [
+                BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                  child: Container(color: Colors.black.withOpacity(0.1)),
                 ),
-              ],
-            ),
-            child: SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Select Date",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: FractionallySizedBox(
+                    heightFactor: sheetHeight,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ],
-                    ),
+                      ),
+                      child: SafeArea(
+                        top: false,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                          child: Column(
+                            children: [
+                              Center(
+                                child: Container(
+                                  height: 5,
+                                  width: 100,
+                                  decoration: BoxDecoration(
+                                    color: Color(0xff004370),
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 20),
 
-                    const SizedBox(height: 10),
+                              /// ------------------ TAB BUTTONS -------------------
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: FilterButtons(
+                                      onPressed: () {
+                                        setState(() => selectedTab = 0);
+                                      },
+                                      ddName: "Calendar",
+                                      width: double.infinity,
+                                      isActive: selectedTab == 0,
+                                    ),
+                                  ),
+                                  SizedBox(width: 15),
+                                  Expanded(
+                                    child: FilterButtons(
+                                      onPressed: () {
+                                        setState(() => selectedTab = 1);
+                                      },
+                                      ddName: "Filter",
+                                      width: double.infinity,
+                                      isActive: selectedTab == 1,
+                                    ),
+                                  ),
+                                ],
+                              ),
 
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Theme(
-                          data: Theme.of(context).copyWith(
-                            colorScheme: ColorScheme.light(
-                              primary: AppTextTheme.primaryColor,
-                              onPrimary: Colors.white,
-                              onSurface: Colors.black87,
-                            ),
-                          ),
-                          child: CalendarDatePicker(
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime(1900),
-                            lastDate: DateTime.now(),
-                            onDateChanged: (date) {
-                              final formattedDate =
-                                  "${date.day.toString().padLeft(2, '0')}/"
-                                  "${date.month.toString().padLeft(2, '0')}/"
-                                  "${date.year}";
+                              SizedBox(height: 20),
 
-                              controller.text = formattedDate;
-                              Navigator.pop(context);
-                            },
+                              Expanded(
+                                child: selectedTab == 0
+                                    ? _calendarView(context, (value) {
+                                        Navigator.pop(
+                                          context,
+                                          value,
+                                        ); // Pop correctly
+                                      })
+                                    : _filterView(years, selectedYear, (year) {
+                                        setState(() => selectedYear = year);
+                                      }),
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          ),
+              ],
+            );
+          },
         );
       },
     );
@@ -191,6 +218,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
               child: Column(
                 children: [
+                  SizedBox(height: 10),
+                  Center(
+                    child: Container(
+                      height: 5,
+                      width: 100,
+                      decoration: BoxDecoration(
+                        color: Color(0xff004370),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -255,68 +293,111 @@ class _ProfileScreenState extends State<ProfileScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return FractionallySizedBox(
-          heightFactor: 0.7,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+        return Stack(
+          children: [
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4), // amount of blur
+              child: Container(
+                color: Colors.black.withOpacity(0.1), // light transparent layer
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 10,
-                  spreadRadius: 2,
-                ),
-              ],
             ),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        "Select Relation",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.pop(context),
+            Align(
+              alignment: AlignmentGeometry.bottomCenter,
+              child: FractionallySizedBox(
+                heightFactor: 0.5,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        spreadRadius: 2,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                    child: Column(
+                      children: [
+                        Center(
+                          child: Container(
+                            height: 5,
+                            width: 100,
+                            decoration: BoxDecoration(
+                              color: Color(0xff004370),
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 10),
 
-                  Expanded(
-                    child: ListView.separated(
-                      separatorBuilder: (context, index) {
-                        return Divider();
-                      },
-                      itemCount: relations.length,
-                      itemBuilder: (context, index) {
-                        final relation = relations[index];
-                        return ListTile(
-                          title: Text(relation),
-                          onTap: () {
-                            controller.text = relation;
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Select Relation",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.close),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
 
-                            Navigator.pop(context);
-                          },
-                        );
-                      },
+                        Expanded(
+                          child: ListView.separated(
+                            separatorBuilder: (context, index) {
+                              return Divider();
+                            },
+                            itemCount: relations.length,
+                            itemBuilder: (context, index) {
+                              final relation = relations[index];
+                              return ListTile(
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 0,
+                                ), // No bottom padding
+                                title: Text(
+                                  relation,
+                                  style: AppTextTheme.subItemTitle,
+                                ),
+                                onTap: () {
+                                  controller.text = relation;
+                                  Navigator.pop(context);
+                                },
+                              );
+
+                              // return InkWell(
+                              //   onTap: () {
+                              //     controller.text = relation;
+
+                              //     Navigator.pop(context);
+                              //   },
+                              //   child: Text(
+                              //       relation,
+                              //       style: AppTextTheme.subTitle,
+                              //     ),
+                              // );
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
+                ),
               ),
             ),
-          ),
+          ],
         );
       },
     );
@@ -328,240 +409,315 @@ class _ProfileScreenState extends State<ProfileScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
-        return FractionallySizedBox(
-          heightFactor: 0.80,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+        return Stack(
+          children: [
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4), // amount of blur
+              child: Container(
+                color: Colors.black.withOpacity(0.1), // light transparent layer
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 10,
-                  spreadRadius: 2,
-                ),
-              ],
             ),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Add Dependent', style: AppTextTheme.pageTitle),
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close),
+            Align(
+              alignment: AlignmentGeometry.bottomCenter,
+              child: FractionallySizedBox(
+                heightFactor: 0.80,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        spreadRadius: 2,
                       ),
                     ],
                   ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                    child: Column(
+                      children: [
+                        Center(
+                          child: Container(
+                            height: 5,
+                            width: 100,
+                            decoration: BoxDecoration(
+                              color: Color(0xff004370),
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 10),
 
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 0),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Personal Details',
-                              style: AppTextTheme.pageTitle.copyWith(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              'Add Dependent',
+                              style: AppTextTheme.pageTitle,
                             ),
-                            const SizedBox(height: 20),
-                            CustomTextFieldWithName(
-                              keyboardType: TextInputType.text,
-
-                              controller: name,
-                              hintText: "Text",
-                              ddName: 'Name',
+                            IconButton(
+                              onPressed: () => Navigator.pop(context),
+                              icon: const Icon(Icons.close),
                             ),
-                            CustomTextFieldWithName(
-                              controller: relation,
-                              hintText: "Text",
-                              ddName: 'Relation',
-                              suffixIcon: "assets/icons/down_icon.png",
-                              onTap: () {
-                                FocusScope.of(context).unfocus();
-                                _showRelationBottomSheet(context, relation);
-                              },
-                              readOnly: true,
-                            ),
-
-                            CustomTextFieldWithName(
-                              controller: dob,
-                              hintText: "DD/MM/YYYY",
-                              ddName: 'Date of Birth',
-                              readOnly: true,
-                              suffixIcon: "assets/icons/calender.png",
-                              onTap: () {
-                                FocusScope.of(context).unfocus();
-                                _showCalenderBottomSheet(context, dob);
-                              },
-                            ),
-
-                            CustomTextFieldWithName(
-                              readOnly: true,
-                              controller: doc,
-                              hintText: "DD/MM/YYYY",
-                              ddName: 'Date of Coverage',
-                              suffixIcon: "assets/icons/calender.png",
-                              onTap: () {
-                                FocusScope.of(context).unfocus();
-                                _showCalenderBottomSheet(context, doc);
-                              },
-                            ),
-
-                            CustomTextFieldWithName(
-                              controller: ocupation,
-                              hintText: "Select Occupation",
-                              ddName: 'Occupation',
-                              readOnly: true,
-                              suffixIcon: "assets/icons/down_icon.png",
-                              onTap: () {
-                                _showOccupationBottomSheet(context, ocupation);
-                              },
-                            ),
-
-                            Text(
-                              'Contact Details',
-                              style: AppTextTheme.pageTitle.copyWith(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            CustomTextFieldWithName(
-                              keyboardType: TextInputType.emailAddress,
-
-                              controller: emailId,
-                              hintText: "user@email.com",
-                              ddName: 'Email ID',
-                            ),
-                            CustomTextFieldWithName(
-                              keyboardType: TextInputType.phone,
-
-                              controller: mobileNo,
-                              hintText: "+91 98765 43210",
-                              ddName: 'Mobile No.',
-                            ),
-
-                            Text(
-                              'Add Documents',
-                              style: AppTextTheme.pageTitle.copyWith(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            DottedBorder(
-                              options: RoundedRectDottedBorderOptions(
-                                radius: Radius.circular(12),
-                                strokeWidth: 2,
-                                dashPattern: [6, 4],
-                                color: AppTextTheme.primaryColor,
-                              ),
-                              child: Container(
-                                height: 150,
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  color: Color(0xFF00B3Ac).withOpacity(0.10),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Image.asset(
-                                      'assets/icons/upload_icon.png',
-                                      width: 60,
-                                      height: 60,
-                                    ),
-                                    SizedBox(width: 12),
-                                    Text(
-                                      'Tap to upload documents',
-                                      style: AppTextTheme.subItemTitle.copyWith(
-                                        color: AppTextTheme.primaryColor,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-
-                            SizedBox(height: 20),
-                            DottedBorder(
-                              options: RoundedRectDottedBorderOptions(
-                                radius: Radius.circular(50),
-                                strokeWidth: 2,
-                                dashPattern: [6, 4],
-                                color: AppTextTheme.primaryColor,
-                              ),
-                              child: Container(
-                                width: double.infinity,
-                                height: 45,
-                                decoration: BoxDecoration(
-                                  color: Color(0xFF00B3Ac).withOpacity(0.10),
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Image.asset(
-                                          'assets/icons/faq_icon.png',
-                                          color: AppTextTheme.primaryColor,
-                                          width: 60,
-                                          height: 60,
-                                        ),
-
-                                        Text(
-                                          'FAQ Document',
-                                          style: AppTextTheme.subTitle.copyWith(
-                                            color: AppTextTheme.primaryColor,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Image.asset(
-                                      'assets/icons/trash.png',
-                                      width: 60,
-                                      height: 60,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 20),
-                            Center(
-                              child: Buttons(
-                                onPressed: () {},
-                                ddName: "Save",
-                                width: 360,
-                              ),
-                            ),
-                            SizedBox(height: 20),
                           ],
                         ),
-                      ),
+
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 0),
+                            child: SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Personal Details',
+                                    style: AppTextTheme.pageTitle.copyWith(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  CustomTextFieldWithName(
+                                    keyboardType: TextInputType.text,
+                                    controller: name,
+                                    hintText: "Text",
+                                    ddName: 'Name',
+                                  ),
+                                  CustomTextFieldWithName(
+                                    controller: relation,
+                                    hintText: "Text",
+                                    ddName: 'Relation',
+                                    suffixIcon: "assets/icons/down_icon.svg",
+                                    onTap: () {
+                                      FocusScope.of(context).unfocus();
+                                      _showRelationBottomSheet(
+                                        context,
+                                        relation,
+                                      );
+                                    },
+                                    readOnly: true,
+                                  ),
+
+                                  CustomTextFieldWithName(
+                                    controller: dob,
+                                    hintText: "DD/MM/YYYY",
+                                    ddName: 'Date of Birth',
+                                    readOnly: true,
+                                    suffixIcon: "assets/icons/calender.svg",
+                                    onTap: () async {
+                                      FocusScope.of(context).unfocus();
+
+                                      final pickedDate =
+                                          await _showCalenderBottomSheet(
+                                            context,
+                                            dob,
+                                          );
+
+                                      if (pickedDate != null) {
+                                        setState(() {
+                                          dob.text =
+                                              pickedDate; // <-- PUT DATE IN TEXTFIELD
+                                        });
+                                      }
+                                    },
+                                  ),
+
+                                  CustomTextFieldWithName(
+                                    readOnly: true,
+                                    controller: doc,
+                                    hintText: "DD/MM/YYYY",
+                                    ddName: 'Date of Coverage',
+                                    suffixIcon: "assets/icons/calender.svg",
+                                    onTap: () async {
+                                      FocusScope.of(context).unfocus();
+
+                                      final pickedDate =
+                                          await _showCalenderBottomSheet(
+                                            context,
+                                            doc,
+                                          );
+
+                                      if (pickedDate != null) {
+                                        setState(() {
+                                          doc.text =
+                                              pickedDate; // <-- PUT DATE IN TEXTFIELD
+                                        });
+                                      }
+                                    },
+                                  ),
+
+                                  CustomTextFieldWithName(
+                                    controller: ocupation,
+                                    hintText: "Select Occupation",
+                                    ddName: 'Occupation',
+                                    readOnly: true,
+                                    suffixIcon: "assets/icons/down_icon.svg",
+                                    onTap: () {
+                                      _showOccupationBottomSheet(
+                                        context,
+                                        ocupation,
+                                      );
+                                    },
+                                  ),
+
+                                  Text(
+                                    'Contact Details',
+                                    style: AppTextTheme.pageTitle.copyWith(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  CustomTextFieldWithName(
+                                    keyboardType: TextInputType.emailAddress,
+
+                                    controller: emailId,
+                                    hintText: "user@email.com",
+                                    ddName: 'Email ID',
+                                  ),
+                                  CustomTextFieldWithName(
+                                    keyboardType: TextInputType.phone,
+
+                                    controller: mobileNo,
+                                    hintText: "+91 98765 43210",
+                                    ddName: 'Mobile No.',
+                                  ),
+
+                                  Text(
+                                    'Add Documents',
+                                    style: AppTextTheme.pageTitle.copyWith(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  DottedBorder(
+                                    options: RoundedRectDottedBorderOptions(
+                                      radius: Radius.circular(12),
+                                      strokeWidth: 2,
+                                      dashPattern: [6, 4],
+                                      color: AppTextTheme.primaryColor,
+                                    ),
+                                    child: Container(
+                                      height: 150,
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        color: Color(
+                                          0xFF00B3Ac,
+                                        ).withOpacity(0.10),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          SvgPicture.asset(
+                                            'assets/icons/upload_icon.svg',
+                                            width: 24,
+                                            height: 24,
+                                          ),
+                                          SizedBox(width: 12),
+                                          Text(
+                                            'Tap to upload documents',
+                                            style: AppTextTheme.subItemTitle
+                                                .copyWith(
+                                                  color:
+                                                      AppTextTheme.primaryColor,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+
+                                  SizedBox(height: 20),
+                                  DottedBorder(
+                                    options: RoundedRectDottedBorderOptions(
+                                      radius: Radius.circular(50),
+                                      strokeWidth: 2,
+                                      dashPattern: [6, 4],
+                                      color: AppTextTheme.primaryColor,
+                                    ),
+                                    child: Container(
+                                      width: double.infinity,
+                                      height: 45,
+                                      decoration: BoxDecoration(
+                                        color: Color(
+                                          0xFF00B3Ac,
+                                        ).withOpacity(0.10),
+                                        borderRadius: BorderRadius.circular(50),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 14,
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            SvgPicture.asset(
+                                              'assets/icons/fav_icon.svg',
+                                              color: AppTextTheme.primaryColor,
+                                              width: 24,
+                                              height: 24,
+                                            ),
+
+                                            Center(
+                                              child: Text(
+                                                'FAQ Document',
+                                                style: AppTextTheme.subTitle
+                                                    .copyWith(
+                                                      color: AppTextTheme
+                                                          .primaryColor,
+                                                    ),
+                                              ),
+                                            ),
+                                            SvgPicture.asset(
+                                              'assets/icons/trash.svg',
+                                              width: 24,
+                                              height: 24,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 20),
+                                  Center(
+                                    child: Buttons(
+                                      onPressed: () {},
+                                      ddName: "Save",
+                                      width: 360,
+                                    ),
+                                  ),
+                                  SizedBox(height: 20),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
+                ),
               ),
             ),
-          ),
+          ],
         );
       },
     );
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print("controllers token :  ${controllers.authToken.toString()}");
+    print("controllers user date :  ${controllers.authUser.toString()}");
   }
 
   @override
@@ -572,6 +728,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: Text("Profile", style: AppTextTheme.pageTitle),
         iconTheme: const IconThemeData(color: Colors.black),
       ),
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(12.0),
@@ -588,10 +745,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       fontSize: 16,
                     ),
                   ),
-                  Image.asset(
-                    'assets/icons/edit_icon.png',
-                    width: 42,
-                    height: 42,
+                  SvgPicture.asset(
+                    'assets/icons/edit_icon.svg',
+                    width: 30,
+                    height: 30,
                   ),
                 ],
               ),
@@ -629,7 +786,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ddName: "Add Dependent",
 
           width: double.infinity,
-          iconPath: "assets/icons/add_dependent.png",
+          iconPath: "assets/icons/add_dependent.svg",
         ),
       ),
     );
@@ -655,9 +812,9 @@ Widget employeeInfoCard(BuildContext context) {
       borderRadius: BorderRadius.circular(12),
       boxShadow: [
         BoxShadow(
-          color: const Color(0xFF2D7C78),
+          color: Color(0XFF00635F),
           offset: const Offset(6, 6),
-          blurRadius: 1,
+          blurRadius: 0,
         ),
       ],
       border: Border.all(color: const Color(0xFF56B3AD), width: 1.2),
@@ -759,4 +916,91 @@ class FeatureItem2 extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _calendarView(BuildContext context, Function(String) onSelectDate) {
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
+
+  return StatefulBuilder(
+    builder: (context, setState) {
+      return TableCalendar(
+        focusedDay: _focusedDay,
+        firstDay: DateTime(1900),
+        lastDay: DateTime(2900),
+
+        selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+
+        calendarStyle: CalendarStyle(
+          todayDecoration: const BoxDecoration(
+            color: AppTextTheme.primaryColor,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Color(0XFF00635F),
+                offset: Offset(3, 3),
+                blurRadius: 0,
+              ),
+            ],
+          ),
+          todayTextStyle: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+          selectedDecoration: const BoxDecoration(
+            color: AppTextTheme.primaryColor,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Color(0XFF00635F),
+                offset: Offset(3, 3),
+                blurRadius: 0,
+              ),
+            ],
+          ),
+          selectedTextStyle: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+
+        onDaySelected: (selectedDay, focusedDay) {
+          setState(() {
+            _selectedDay = selectedDay;
+            _focusedDay = focusedDay;
+          });
+
+          final formattedDate =
+              "${selectedDay.day.toString().padLeft(2, '0')}/"
+              "${selectedDay.month.toString().padLeft(2, '0')}/"
+              "${selectedDay.year}";
+
+          onSelectDate(formattedDate); // 🔥 Return selected date
+        },
+      );
+    },
+  );
+}
+
+/// FILTER TAB — YEAR LIST WITH RADIO BUTTONS
+Widget _filterView(List<int> years, int selectedYear, Function(int) onSelect) {
+  return ListView.builder(
+    itemCount: years.length,
+    itemBuilder: (context, index) {
+      return InkWell(
+        onTap: () {
+          onSelect(years[index]);
+
+          Navigator.pop(
+            context,
+            "01/01/${years[index]}",
+          ); // <-- RETURN DATE FIX
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Text(years[index].toString(), style: TextStyle(fontSize: 18)),
+        ),
+      );
+    },
+  );
 }

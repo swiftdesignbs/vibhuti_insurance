@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 
 class FamilyCardTwo extends StatelessWidget {
@@ -40,7 +41,7 @@ class FamilyCardTwo extends StatelessWidget {
           CircleAvatar(
             radius: 20,
             backgroundColor: AppTextTheme.primaryColor,
-            child: Image.asset(iconPath, height: 28, width: 28),
+            child: SvgPicture.asset(iconPath, height: 28, width: 28),
           ),
           const SizedBox(width: 12),
           Expanded(

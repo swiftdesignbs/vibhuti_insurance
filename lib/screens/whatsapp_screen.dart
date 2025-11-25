@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart' as http;
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/aes_encryption.dart';
@@ -14,64 +15,23 @@ class WhatsappScreen extends StatefulWidget {
 }
 
 class _WhatsappScreenState extends State<WhatsappScreen> {
-  String decryptedResponse = "Fetching data...";
-  
-  @override
-  void initState() {
-    super.initState();
-    fetchLoginConfig();
-  }
-
-  Future<void> fetchLoginConfig() async {
-    const url =
-        "https://uatebpfapi.vibhutiinsurance.com/api/BCGModule/InsertAllLoginconfigData";
-
-    final body = {"Action": "fetchloginconfig", "CorporateCode": "HOH"};
-
-    try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(body),
-      );
-
-      if (response.statusCode == 200) {
-        final encryptedResponse = response.body.replaceAll('"', '');
-        final decryptedText = AesEncryption.decryptAES(encryptedResponse);
-        setState(() {
-          decryptedResponse = decryptedText;
-        });
-      } else {
-        setState(() {
-          decryptedResponse = "Error: ${response.statusCode}";
-        });
-      }
-    } catch (e) {
-      setState(() {
-        decryptedResponse = "Error: $e";
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppTextTheme.appBarColor,
-        title: Text("Login Config (AES)", style: AppTextTheme.pageTitle),
+        title: Text("Whatsapp", style: AppTextTheme.pageTitle),
         automaticallyImplyLeading: false,
         leading: IconButton(
           onPressed: () => widget.scaffoldKey?.currentState?.openDrawer(),
-          icon: Image.asset('assets/icons/menu.png', height: 24, width: 24),
+          icon: SvgPicture.asset('assets/icons/menu.svg', height: 16, width: 16),
         ),
       ),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Text(
-            decryptedResponse,
-            style: const TextStyle(fontSize: 14, fontFamily: 'monospace'),
-          ),
+        child: Center(
+          child: Text("Whatsapp Screen", style: AppTextTheme.pageTitle),
         ),
       ),
     );

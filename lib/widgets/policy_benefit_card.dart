@@ -61,13 +61,15 @@ class _PolicyBenefitsCardState extends State<PolicyBenefitsCard>
       // ),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(13),
         border: Border.all(color: AppTextTheme.primaryColor),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF2D7C78), // darker teal shadow
+            color: Color(0XFF00635F),
+
+            //  color: const Color(0xFF2D7C78), // darker teal shadow
             offset: const Offset(6, 6), // shadow position
-            blurRadius: 1,
+            blurRadius: 0,
           ),
         ],
       ),
@@ -196,7 +198,13 @@ class FeatureItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: AppTextTheme.subTitle),
+          Text(
+            title,
+            style: AppTextTheme.subTitle.copyWith(
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
+            ),
+          ),
           const SizedBox(height: 4),
           Text(
             description,

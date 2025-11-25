@@ -14,7 +14,25 @@ class HealthCheckUpFormScreen extends StatefulWidget {
 
 class _HealthCheckUpFormScreenState extends State<HealthCheckUpFormScreen> {
   bool isChecked = false;
-
+  TextEditingController employeeCodeController = TextEditingController();
+  TextEditingController employeeNameController = TextEditingController();
+  TextEditingController emailIDController = TextEditingController();
+  TextEditingController mobileNoController = TextEditingController();
+  TextEditingController policyTypeController = TextEditingController();
+  TextEditingController policyNoController = TextEditingController();
+  TextEditingController patientNameController = TextEditingController();
+  TextEditingController ageController = TextEditingController();
+  TextEditingController genderController = TextEditingController();
+  TextEditingController relationController = TextEditingController();
+  TextEditingController typesNServices = TextEditingController();
+  TextEditingController appointmentDate1Controller = TextEditingController();
+  TextEditingController appointmentDate2Controller = TextEditingController();
+  TextEditingController hospitalCenterName = TextEditingController();
+  TextEditingController hospitalAddress = TextEditingController();
+  TextEditingController pincodeController = TextEditingController();
+  TextEditingController cityController = TextEditingController();
+  TextEditingController availablePlans = TextEditingController();
+  TextEditingController planCost = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,6 +41,7 @@ class _HealthCheckUpFormScreenState extends State<HealthCheckUpFormScreen> {
         title: Text("Health Check-up Form", style: AppTextTheme.pageTitle),
         iconTheme: const IconThemeData(color: Colors.black),
       ),
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -30,120 +49,158 @@ class _HealthCheckUpFormScreenState extends State<HealthCheckUpFormScreen> {
             children: [
               CustomTextFieldWithName(
                 keyboardType: TextInputType.number,
-                controller: TextEditingController(),
+                controller: employeeCodeController,
                 hintText: "Text",
                 ddName: 'Employee Code',
               ),
+              SizedBox(height: 5),
               CustomTextFieldWithName(
                 keyboardType: TextInputType.text,
 
-                controller: TextEditingController(),
+                controller: employeeNameController,
                 hintText: "Text",
                 ddName: 'Employee Name',
               ),
+              SizedBox(height: 5),
+
               CustomTextFieldWithName(
                 keyboardType: TextInputType.emailAddress,
 
-                controller: TextEditingController(),
+                controller: emailIDController,
                 hintText: "Text",
                 ddName: 'Email ID',
               ),
+              SizedBox(height: 5),
+
               CustomTextFieldWithName(
                 keyboardType: TextInputType.phone,
 
-                controller: TextEditingController(),
+                controller: mobileNoController,
                 hintText: "Text",
                 ddName: 'Mobile No.',
               ),
+              SizedBox(height: 5),
+
               CustomTextFieldWithName(
                 keyboardType: TextInputType.text,
 
-                controller: TextEditingController(),
+                controller: policyTypeController,
                 hintText: "Text",
                 ddName: 'Policy Type',
               ),
+              SizedBox(height: 5),
+
               CustomTextFieldWithName(
                 keyboardType: TextInputType.text,
 
-                controller: TextEditingController(),
+                controller: policyNoController,
                 hintText: "Text",
                 ddName: 'Policy No.',
               ),
+              SizedBox(height: 5),
+
               CustomTextFieldWithName(
                 keyboardType: TextInputType.text,
 
-                controller: TextEditingController(),
+                controller: patientNameController,
                 hintText: "Text",
                 ddName: 'Patient or Member Name',
               ),
+              SizedBox(height: 5),
+
               CustomTextFieldWithName(
                 keyboardType: TextInputType.number,
 
-                controller: TextEditingController(),
+                controller: ageController,
                 hintText: "Text",
                 ddName: 'Age',
               ),
+              SizedBox(height: 5),
+
               CustomTextFieldWithName(
                 keyboardType: TextInputType.text,
 
-                controller: TextEditingController(),
+                controller: genderController,
                 hintText: "Text",
                 ddName: 'Gender',
               ),
+              SizedBox(height: 5),
+
               CustomTextFieldWithName(
                 keyboardType: TextInputType.text,
 
-                controller: TextEditingController(),
+                controller: relationController,
                 hintText: "Text",
                 ddName: 'Relation',
               ),
+              SizedBox(height: 5),
+
               CustomTextFieldWithName(
                 keyboardType: TextInputType.text,
 
-                controller: TextEditingController(),
+                controller: typesNServices,
                 hintText: "Text",
                 ddName: 'Type Of Services',
               ),
+              SizedBox(height: 5),
+
               CustomTextFieldWithName(
-                controller: TextEditingController(),
+                controller: appointmentDate1Controller,
                 hintText: "DD/MM/YYYY",
                 ddName: 'New Appointment Date 1',
+                suffixIcon: "assets/icons/calender.svg",
               ),
+              SizedBox(height: 5),
+
               CustomTextFieldWithName(
-                controller: TextEditingController(),
+                controller: appointmentDate2Controller,
                 hintText: "DD/MM/YYYY",
                 ddName: 'New Appointment Date 2',
+                suffixIcon: "assets/icons/calender.svg",
               ),
+              SizedBox(height: 5),
+
               CustomTextFieldWithName(
-                controller: TextEditingController(),
+                controller: hospitalCenterName,
                 hintText: "Text",
                 ddName: 'Hospital or Daignostics Centre Name',
               ),
+              SizedBox(height: 5),
+
               CustomTextFieldWithName(
-                controller: TextEditingController(),
+                controller: hospitalAddress,
                 hintText: "Text",
                 ddName: 'Hospital Address',
               ),
+              SizedBox(height: 5),
+
               CustomTextFieldWithName(
-                controller: TextEditingController(),
+                controller: pincodeController,
                 hintText: "Text",
                 ddName: 'Pincode',
               ),
+              SizedBox(height: 5),
+
               CustomTextFieldWithName(
-                controller: TextEditingController(),
+                controller: cityController,
                 hintText: "Text",
                 ddName: 'City',
               ),
+              SizedBox(height: 5),
+
               CustomTextFieldWithName(
-                controller: TextEditingController(),
+                controller: availablePlans,
                 hintText: "Text",
                 ddName: 'Available Plans',
               ),
+              SizedBox(height: 5),
+
               CustomTextFieldWithName(
-                controller: TextEditingController(),
+                controller: planCost,
                 hintText: "Text",
                 ddName: 'Plan Cost',
               ),
+
               const SizedBox(height: 20),
 
               Row(

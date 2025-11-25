@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/health_checkup_form.dart';
 
@@ -87,74 +89,98 @@ class _BookSlotDentalCheckUpScreenState
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
-        return FractionallySizedBox(
-          heightFactor: 0.65,
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+        return Stack(
+          children: [
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4), // amount of blur
+              child: Container(
+                color: Colors.black.withOpacity(0.1), // light transparent layer
               ),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Dental Package", style: AppTextTheme.pageTitle),
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close, color: Colors.black),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 10),
-
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        buildBulletPoint("Extractions"),
-                        buildBulletPoint("Filling and Repairs"),
-                        buildBulletPoint("Root Canals"),
-                        buildBulletPoint("Sealants"),
-                        buildBulletPoint("Bridges and Implants"),
-
-                        Text(
-                          "Please Take Note Of The Following Points:",
-                          style: AppTextTheme.subTitle.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-
-                        buildBulletPoint(
-                          "If any above treatment is done along with doctor consultation and medicine, then only it is covered under dental treatment.",
-                        ),
-                        buildBulletPoint(
-                          "Only consultation charges and medicine charges are not payable under dental package.",
-                        ),
-                        buildBulletPoint(
-                          "Please inform customer service if you are diabetic or a cardiac patient.",
-                        ),
-                        buildBulletPoint(
-                          "If any above treatment is done along with cleaning and polishing, then is covered under dental treatment.",
-                        ),
-                        buildBulletPoint(
-                          "Only cleaning and polishing is not payable.",
-                        ),
-                      ],
+            Align(
+              alignment: AlignmentGeometry.bottomCenter,
+              child: FractionallySizedBox(
+                heightFactor: 0.65,
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
                     ),
                   ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Container(
+                          height: 5,
+                          width: 100,
+                          decoration: BoxDecoration(
+                            color: Color(0xff004370),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Dental Package", style: AppTextTheme.pageTitle),
+                          IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(Icons.close, color: Colors.black),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              buildBulletPoint("Extractions"),
+                              buildBulletPoint("Filling and Repairs"),
+                              buildBulletPoint("Root Canals"),
+                              buildBulletPoint("Sealants"),
+                              buildBulletPoint("Bridges and Implants"),
+
+                              Text(
+                                "Please Take Note Of The Following Points:",
+                                style: AppTextTheme.subTitle.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+
+                              buildBulletPoint(
+                                "If any above treatment is done along with doctor consultation and medicine, then only it is covered under dental treatment.",
+                              ),
+                              buildBulletPoint(
+                                "Only consultation charges and medicine charges are not payable under dental package.",
+                              ),
+                              buildBulletPoint(
+                                "Please inform customer service if you are diabetic or a cardiac patient.",
+                              ),
+                              buildBulletPoint(
+                                "If any above treatment is done along with cleaning and polishing, then is covered under dental treatment.",
+                              ),
+                              buildBulletPoint(
+                                "Only cleaning and polishing is not payable.",
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         );
       },
     );
@@ -187,13 +213,13 @@ class _BookSlotDentalCheckUpScreenState
         scaffoldKey: widget.scaffoldKey,
         showImplyingIcon: true,
         showWelcomeText: false,
-      ),
+      ),   backgroundColor: Colors.white,
       //   appBar: AppBar(
       //   automaticallyImplyLeading: true,
       //   backgroundColor: AppTextTheme.appBarColor,
       //   title: Text("Book Slot", style: AppTextTheme.pageTitle),
       //   iconTheme: const IconThemeData(color: Colors.black),
-      // ),
+      // ),   backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -208,10 +234,29 @@ class _BookSlotDentalCheckUpScreenState
 
                 return Container(
                   margin: const EdgeInsets.symmetric(vertical: 6),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppTextTheme.primaryColor),
-                  ),
+                  decoration: index == 0
+                      ? BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: AppTextTheme.primaryColor),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0XFF00635F),
+                              // darker teal shadow
+                              offset: const Offset(6, 6), // shadow position
+                              blurRadius: 0,
+                            ),
+                          ],
+                        )
+                      : BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: AppTextTheme.primaryColor),
+                        ),
+                  // decoration: BoxDecoration(
+                  //   borderRadius: BorderRadius.circular(20),
+                  //   border: Border.all(color: AppTextTheme.primaryColor),
+                  // ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

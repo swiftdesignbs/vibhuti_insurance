@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/health_checkup_form.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
@@ -86,71 +88,100 @@ class _BookSlotVisionCheckUpScreenState
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
-        return FractionallySizedBox(
-          heightFactor: 0.85,
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+        return Stack(
+          children: [
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4), // amount of blur
+              child: Container(
+                color: Colors.black.withOpacity(0.1), // light transparent layer
               ),
             ),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("Eye Package", style: AppTextTheme.pageTitle),
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close, color: Colors.black),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 10),
-                  buildBulletPoint("Only Powered glass / lenses are covered."),
-                  buildBulletPoint(
-                    "One Spectacle or one pair of contact lens is payable within family upto 10k",
-                  ),
-                  buildBulletPoint(
-                    "Disposable contact lenses are also payable subject to period Of contact lenses",
-                  ),
-
-                  Text(
-                    "Please Take Note Of The Following Points:",
-                    style: AppTextTheme.subTitle.copyWith(
-                      fontWeight: FontWeight.bold,
+            Align(
+              alignment: AlignmentGeometry.bottomCenter,
+              child: FractionallySizedBox(
+                heightFactor: 0.85,
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Container(
+                            height: 5,
+                            width: 100,
+                            decoration: BoxDecoration(
+                              color: Color(0xff004370),
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Eye Package", style: AppTextTheme.pageTitle),
+                            IconButton(
+                              onPressed: () => Navigator.pop(context),
+                              icon: const Icon(
+                                Icons.close,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
 
-                  buildBulletPoint(
-                    "If any above treatment is done along with doctor consultation and medicine, then only it is covered under dental treatment.",
-                  ),
-                  buildBulletPoint(
-                    "Only consultation charges and medicine charges are not payable under dental package.",
-                  ),
-                  buildBulletPoint(
-                    "Please inform customer service if you are diabetic or a cardiac patient.",
-                  ),
-                  buildBulletPoint(
-                    "If any above treatment is done along with cleaning and polishing, then is covered under dental treatment.",
-                  ),
-                  buildBulletPoint(
-                    "Only cleaning and polishing is not payable.",
-                  ),
+                        const SizedBox(height: 10),
+                        buildBulletPoint(
+                          "Only Powered glass / lenses are covered.",
+                        ),
+                        buildBulletPoint(
+                          "One Spectacle or one pair of contact lens is payable within family upto 10k",
+                        ),
+                        buildBulletPoint(
+                          "Disposable contact lenses are also payable subject to period Of contact lenses",
+                        ),
 
-                  const SizedBox(height: 20),
-                ],
+                        Text(
+                          "Please Take Note Of The Following Points:",
+                          style: AppTextTheme.subTitle.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+
+                        buildBulletPoint(
+                          "If any above treatment is done along with doctor consultation and medicine, then only it is covered under dental treatment.",
+                        ),
+                        buildBulletPoint(
+                          "Only consultation charges and medicine charges are not payable under dental package.",
+                        ),
+                        buildBulletPoint(
+                          "Please inform customer service if you are diabetic or a cardiac patient.",
+                        ),
+                        buildBulletPoint(
+                          "If any above treatment is done along with cleaning and polishing, then is covered under dental treatment.",
+                        ),
+                        buildBulletPoint(
+                          "Only cleaning and polishing is not payable.",
+                        ),
+
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
-          ),
+          ],
         );
       },
     );
@@ -183,7 +214,7 @@ class _BookSlotVisionCheckUpScreenState
         scaffoldKey: widget.scaffoldKey,
         showImplyingIcon: true,
         showWelcomeText: false,
-      ),
+      ),   backgroundColor: Colors.white,
       // appBar: AppBar(
       //   automaticallyImplyLeading: true,
       //   backgroundColor: AppTextTheme.appBarColor,
@@ -207,10 +238,33 @@ class _BookSlotVisionCheckUpScreenState
 
                   return Container(
                     margin: const EdgeInsets.symmetric(vertical: 6),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: AppTextTheme.primaryColor),
-                    ),
+                    // decoration: BoxDecoration(
+                    //   borderRadius: BorderRadius.circular(20),
+                    //   border: Border.all(color: AppTextTheme.primaryColor),
+                    // ),
+                    decoration: index == 0
+                        ? BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: AppTextTheme.primaryColor,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0XFF00635F),
+                                // darker teal shadow
+                                offset: const Offset(6, 6), // shadow position
+                                blurRadius: 0,
+                              ),
+                            ],
+                          )
+                        : BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: AppTextTheme.primaryColor,
+                            ),
+                          ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

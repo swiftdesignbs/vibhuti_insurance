@@ -43,8 +43,8 @@
 //               widget.leading ??
 //               IconButton(
 //                 onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-//                 icon: Image.asset(
-//                   'assets/icons/menu.png',
+//                 icon: SvgPicture.asset(
+//                   'assets/icons/menu.svg',
 //                   height: 24,
 //                   width: 24,
 //                 ),
@@ -61,7 +61,7 @@
 //                       onPressed: () {
 //                         widget.onNavigationTap?.call(3); // Navigate to profile
 //                       },
-//                       icon: Image.asset(
+//                       icon: SvgPicture.asset(
 //                         'assets/icons/profile_icon.png',
 //                         height: 24,
 //                         width: 24,
@@ -133,7 +133,7 @@
 //             _buildNavItem('assets/icons/nav1.png'),
 //             _buildNavItem('assets/icons/nav2.png'),
 //             _buildNavItem('assets/icons/nav3.png'),
-//             _buildNavItem('assets/icons/nav4.png'),
+//             _buildNavItem('assets/icons/nav4.svg'),
 //             _buildNavItem('assets/icons/nav5.png'),
 //           ],
 //         ),
@@ -143,10 +143,10 @@
 
 //   BottomNavigationBarItem _buildNavItem(String iconPath) {
 //     return BottomNavigationBarItem(
-//       icon: Image.asset(iconPath, height: 42, width: 42),
+//       icon: SvgPicture.asset(iconPath, height: 42, width: 42),
 //       activeIcon: CircleAvatar(
 //         backgroundColor: AppTextTheme.primaryColor,
-//         child: Image.asset(
+//         child: SvgPicture.asset(
 //           iconPath,
 //           height: 40,
 //           width: 40,

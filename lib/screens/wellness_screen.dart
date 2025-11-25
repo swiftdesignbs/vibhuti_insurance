@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
+
 import 'package:vibhuti_insurance_mobile_app/screens/dental_checkup.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/health_check_up.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/profile_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/app_bar.dart';
+import 'package:vibhuti_insurance_mobile_app/widgets/custom_appdrawer.dart';
 
 class WellnessServicesScreen extends StatefulWidget {
-  final GlobalKey<ScaffoldState>? scaffoldKey;
+  final GlobalKey<ScaffoldState> scaffoldKey;
 
-  const WellnessServicesScreen({super.key, this.scaffoldKey});
+  const WellnessServicesScreen({super.key, required this.scaffoldKey});
 
   @override
   State<WellnessServicesScreen> createState() => _WellnessServicesScreenState();
@@ -17,32 +21,32 @@ class WellnessServicesScreen extends StatefulWidget {
 class _WellnessServicesScreenState extends State<WellnessServicesScreen> {
   final List<Map<String, dynamic>> carouselIcons = [
     {
-      "icon": "assets/icons/wellness_8.png",
+      "icon": "assets/icons/wellness_8.svg",
       "label": "Health Checkup",
       "route": HealthCheckUpScreen(),
     },
     {
-      "icon": "assets/icons/big_wellness_van.png",
+      "icon": "assets/icons/big_wellness_van.svg",
       "label": "Home Sample Collection",
       "route": HealthCheckUpScreen(),
     },
     {
-      "icon": "assets/icons/big_wellness_tooth.png",
+      "icon": "assets/icons/big_wellness_tooth.svg",
       "label": "Dental Checkup",
       "route": DentalCheckUpScreen(),
     },
     {
-      "icon": "assets/icons/big_wellness_eye.png",
+      "icon": "assets/icons/big_wellness_eye.svg",
       "label": "Vision Checkup",
       "route": DentalCheckUpScreen(),
     },
     {
-      "icon": "assets/icons/wellness_3.png",
+      "icon": "assets/icons/wellness_4.svg",
       "label": "OPD Benefits",
       "route": DentalCheckUpScreen(),
     },
     {
-      "icon": "assets/icons/search.png",
+      "icon": "assets/icons/search.svg",
       "label": "Explore More",
       "route": DentalCheckUpScreen(),
     },
@@ -51,12 +55,53 @@ class _WellnessServicesScreenState extends State<WellnessServicesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarUtils.buildCommonAppBar(
-        context: context,
-        screenTitle: "Wellness Services",
+      key: widget.scaffoldKey,
+      drawer: AppDrawer(
         scaffoldKey: widget.scaffoldKey,
-        showWelcomeText: false,
+        parentContext: context,
       ),
+      appBar: AppBar(
+        backgroundColor: AppTextTheme.appBarColor,
+        title: Text(
+          'Wellness Services',
+          style: AppTextTheme.pageTitle.copyWith(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            "assets/icons/menu.svg",
+            height: 16,
+            width: 16,
+          ),
+          onPressed: () {
+            widget.scaffoldKey.currentState?.openDrawer();
+          },
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfileScreen()),
+                );
+              },
+              child: CircleAvatar(
+                backgroundColor: Colors.white,
+                child: SvgPicture.asset(
+                  'assets/icons/profile_icon.svg',
+                  height: 24,
+                  width: 24,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -73,10 +118,10 @@ class _WellnessServicesScreenState extends State<WellnessServicesScreen> {
               final item = carouselIcons[index];
               return InkWell(
                 onTap: () {
-                  pushScreen(
+                  PersistentNavBarNavigator.pushNewScreen(
                     context,
                     screen: item['route'],
-                    withNavBar: true,
+                    withNavBar: true, // OPTIONAL VALUE. True by default.
                     pageTransitionAnimation: PageTransitionAnimation.cupertino,
                   );
                 },
@@ -91,9 +136,13 @@ class _WellnessServicesScreenState extends State<WellnessServicesScreen> {
                         border: Border.all(color: AppTextTheme.primaryColor),
                       ),
                       child: CircleAvatar(
-                        radius: 60,
+                        radius: 50,
                         backgroundColor: Colors.white,
-                        child: Image.asset(item['icon'], height: 56, width: 56),
+                        child: SvgPicture.asset(
+                          item['icon'],
+                          height: 34,
+                          width: 34,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 10),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 
 Widget familyCard({
@@ -9,18 +10,32 @@ Widget familyCard({
 }) {
   return Container(
     width: (MediaQuery.of(context).size.width / 2) - 25,
-    padding: const EdgeInsets.all(8),
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
     decoration: BoxDecoration(
       border: Border.all(color: AppTextTheme.primaryColor),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(14),
       color: Colors.white,
     ),
     child: Row(
       children: [
-        CircleAvatar(
-          radius: 16,
-          backgroundColor: AppTextTheme.primaryColor,
-          child: Image.asset(iconPath, height: 24, width: 24),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(25),
+            boxShadow: [
+              BoxShadow(
+                color: Color(0XFF00635F),
+                offset: const Offset(4, 4),
+                blurRadius: 0,
+              ),
+            ],
+            border: Border.all(color: const Color(0xFF56B3AD), width: 1.2),
+          ),
+          child: CircleAvatar(
+            radius: 16,
+            backgroundColor: AppTextTheme.primaryColor,
+            child: SvgPicture.asset(iconPath, height: 24, width: 24),
+            // child: SvgPicture.asset(iconPath, height: 24, width: 24),
+          ),
         ),
         const SizedBox(width: 10),
         Expanded(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
+
 class CustomTextField extends StatelessWidget {
   const CustomTextField({
     super.key,
@@ -46,7 +48,7 @@ class CustomTextField extends StatelessWidget {
             onChanged: onChanged,
             onTap: onTap,
             readOnly: readOnly,
-            enabled: enabled, // ✅ apply here
+            enabled: enabled,
             keyboardType: keyboardType ?? TextInputType.text,
             maxLength: maxLength,
             inputFormatters: inputFormatters,
@@ -55,7 +57,14 @@ class CustomTextField extends StatelessWidget {
             decoration: InputDecoration(
               hintText: hintText,
               suffixIcon: suffixIcon != null
-                  ? Image.asset(suffixIcon ?? '')
+                  ? Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: SvgPicture.asset(
+                        suffixIcon!,
+                        height: 16,
+                        width: 16,
+                      ),
+                    )
                   : null,
               counterText: "",
               contentPadding: const EdgeInsets.symmetric(
@@ -63,14 +72,11 @@ class CustomTextField extends StatelessWidget {
                 horizontal: 16,
               ),
               enabledBorder: OutlineInputBorder(
-                borderSide: const BorderSide(color: Colors.black, width: 1),
+                borderSide: BorderSide(color: theme.primaryColor, width: 1),
                 borderRadius: BorderRadius.circular(25),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: theme.primaryColor,
-                  width: 1.5,
-                ),
+                borderSide: BorderSide(color: theme.primaryColor, width: 1.5),
                 borderRadius: BorderRadius.circular(25),
               ),
               border: OutlineInputBorder(

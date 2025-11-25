@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/book_slot_dental_checkup.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/book_slot_health_checkup_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/dashboard_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
+import 'package:vibhuti_insurance_mobile_app/widgets/app_bar.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/base_scaffold.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/my_policy_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/health_check_up.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/profile_screen.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/settings.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/notification.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/custom_input_with_name.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/custom_textfield.dart';
 
@@ -148,27 +150,35 @@ class _DentalCheckUpScreenState extends State<DentalCheckUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppTextTheme.appBarColor,
-        title: Text("Dental CheckUp", style: AppTextTheme.pageTitle),
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          onPressed: () => widget.scaffoldKey?.currentState?.openDrawer(),
-          icon: Image.asset('assets/icons/menu.png', height: 24, width: 24),
-        ),
+      // appBar: AppBar(
+      //   backgroundColor: AppTextTheme.appBarColor,
+      //   title: Text("Dental CheckUp", style: AppTextTheme.pageTitle),
+      //   automaticallyImplyLeading: false,
+      //   leading: IconButton(
+      //     onPressed: () => widget.scaffoldKey?.currentState?.openDrawer(),
+      //     icon: SvgPicture.asset('assets/icons/menu.svg', height: 24, width: 24),
+      //   ),
+      // ),
+      appBar: AppBarUtils.buildCommonAppBar(
+        context: context,
+        screenTitle: "Dental CheckUp",
+        scaffoldKey: widget.scaffoldKey,
+        showImplyingIcon: true,
+        showWelcomeText: false,
       ),
+      backgroundColor: Colors.white,
       body: CustomScrollView(
         slivers: [
           // --- Main content (scrollable) ---
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // --- Location Options ---
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       InkWell(
@@ -257,7 +267,7 @@ class _DentalCheckUpScreenState extends State<DentalCheckUpScreen> {
                           controller: stateController,
                           hintText: "Select State",
                           ddName: 'State',
-                          suffixIcon: "assets/icons/down_icon.png",
+                          suffixIcon: "assets/icons/down_icon.svg",
                           onTap: () {
                             FocusScope.of(context).unfocus();
                             _showManuallyBottomSheet(context, stateController);
@@ -268,7 +278,7 @@ class _DentalCheckUpScreenState extends State<DentalCheckUpScreen> {
                           controller: cityController,
                           hintText: "Select City",
                           ddName: 'City',
-                          suffixIcon: "assets/icons/down_icon.png",
+                          suffixIcon: "assets/icons/down_icon.svg",
                           onTap: () {
                             FocusScope.of(context).unfocus();
                             _showManuallyBottomSheet(context, cityController);
@@ -279,7 +289,7 @@ class _DentalCheckUpScreenState extends State<DentalCheckUpScreen> {
                           controller: areaController,
                           hintText: "Select Area",
                           ddName: 'Area',
-                          suffixIcon: "assets/icons/down_icon.png",
+                          suffixIcon: "assets/icons/down_icon.svg",
                           onTap: () {
                             FocusScope.of(context).unfocus();
                             _showManuallyBottomSheet(context, areaController);
@@ -290,7 +300,7 @@ class _DentalCheckUpScreenState extends State<DentalCheckUpScreen> {
                           controller: pincodeController,
                           hintText: "Select Pincode",
                           ddName: 'Pincode',
-                          suffixIcon: "assets/icons/down_icon.png",
+                          suffixIcon: "assets/icons/down_icon.svg",
                           onTap: () {
                             FocusScope.of(context).unfocus();
                             _showManuallyBottomSheet(
@@ -304,7 +314,6 @@ class _DentalCheckUpScreenState extends State<DentalCheckUpScreen> {
                     ),
                   const SizedBox(height: 10),
                   Text('Diagnosis Centre List', style: AppTextTheme.subTitle),
-                  const SizedBox(height: 10),
                 ],
               ),
             ),
@@ -316,12 +325,13 @@ class _DentalCheckUpScreenState extends State<DentalCheckUpScreen> {
             floating: false,
             delegate: _StickySearchBarDelegate(
               child: Container(
+                //  color: Theme.of(context).scaffoldBackgroundColor,
                 color: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 child: CustomTextField(
                   controller: searchController,
                   hintText: "Search Hospital Name",
-                  suffixIcon: "assets/icons/search_color.png",
+                  suffixIcon: "assets/icons/search_color.svg",
                 ),
               ),
             ),
@@ -330,7 +340,7 @@ class _DentalCheckUpScreenState extends State<DentalCheckUpScreen> {
           // --- Gender Filters + Hospital List ---
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -338,13 +348,14 @@ class _DentalCheckUpScreenState extends State<DentalCheckUpScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       genderOption('All'),
-                      SizedBox(width: 15),
+                      SizedBox(width: 18),
                       genderOption('Male'),
-                      SizedBox(width: 15),
+                      SizedBox(width: 18),
 
                       genderOption('Female'),
                     ],
                   ),
+                  const SizedBox(height: 15),
                   Text(
                     'Hospital Center / Count : 10',
                     style: AppTextTheme.subTitle,
@@ -359,72 +370,106 @@ class _DentalCheckUpScreenState extends State<DentalCheckUpScreen> {
           SliverList(
             delegate: SliverChildBuilderDelegate((context, index) {
               final hospital = _allHospitals[index];
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppTextTheme.primaryColor),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
+              return Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+
+                  // decoration: BoxDecoration(
+                  //   borderRadius: BorderRadius.circular(20),
+                  //   border: Border.all(color: AppTextTheme.primaryColor),
+                  // ),
+                  decoration: index == 0
+                      ? BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: AppTextTheme.primaryColor),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0XFF00635F),
+                              // darker teal shadow
+                              offset: const Offset(6, 6), // shadow position
+                              blurRadius: 0,
+                            ),
+                          ],
+                        )
+                      : BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: AppTextTheme.primaryColor),
+                        ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    hospital['name'],
+                                    style: AppTextTheme.subTitle,
+                                    maxLines: 3,
+                                    overflow: TextOverflow.visible,
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                SvgPicture.asset(
+                                  "assets/icons/fav_icon.svg",
+                                  height: 16,
+                                  width: 16,
+                                ),
+                              ],
+                            ),
+
+                            Text(
+                              hospital['address'],
+                              style: AppTextTheme.paragraph,
+                            ),
+                          ],
+                        ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                hospital['name'],
-                                style: AppTextTheme.subTitle,
-                              ),
-                              Image.asset(
-                                "assets/icons/fav_icon.png",
-                                height: 24,
-                                width: 24,
-                              ),
-                            ],
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  BookSlotDentalCheckUpScreen(),
+                              //  BookSlotHealthCheckUpScreen(),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 45,
+                          decoration: BoxDecoration(
+                            color: AppTextTheme.primaryColor,
+                            borderRadius: const BorderRadius.only(
+                              bottomLeft: Radius.circular(20),
+                              bottomRight: Radius.circular(20),
+                            ),
                           ),
-                          Text(
-                            hospital['address'],
-                            style: AppTextTheme.paragraph,
-                          ),
-                        ],
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BookSlotDentalCheckUpScreen(),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        height: 45,
-                        decoration: BoxDecoration(
-                          color: AppTextTheme.primaryColor,
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(20),
-                            bottomRight: Radius.circular(20),
+                          child: Center(
+                            child: Text(
+                              'Book Slot',
+                              style: AppTextTheme.buttonText,
+                            ),
                           ),
                         ),
-                        child: Center(
-                          child: Text(
-                            'Book Slot',
-                            style: AppTextTheme.buttonText,
-                          ),
-                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             }, childCount: _allHospitals.length),
