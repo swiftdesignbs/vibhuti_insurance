@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:vibhuti_insurance_mobile_app/alerts/toast.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 
@@ -54,17 +55,36 @@ class ClaimStatusWidget extends StatelessWidget {
       children: [
         Column(
           children: [
-            CustomPaint(
-              size: const Size(40, 40),
-              painter: HexagonPainter(color),
-              child: SizedBox(
-                width: 40,
-                height: 40,
-                child: Center(child: Icon(icon, color: Colors.white, size: 18)),
+           // const SizedBox(height: 6), // ✅ push hexagon down
+            // CustomPaint(
+            //   size: const Size(40, 40),
+            //   painter: HexagonPainter(color),
+            //   child: SizedBox(
+            //     width: 40,
+            //     height: 40,
+            //     child: Center(child: Icon(icon, color: Colors.white, size: 18)),
+            //   ),
+            // ),
+            SizedBox(
+              width: 40,
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 9,
+                  ), // ✅ pushes icon down to align with title
+                  SvgPicture.asset(
+                    status.toLowerCase() == "completed"
+                        ? "assets/icons/check.svg"
+                        : "assets/icons/exclamation.svg",
+                    width: 40,
+                    height: 40,
+                  ),
+                ],
               ),
             ),
+
             SizedBox(height: 15),
-            if (!isCurrent) Container(width: 2, height: 60, color: color),
+            if (!isCurrent) Container(width: 8, height: 30, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(15)),),
           ],
         ),
         const SizedBox(width: 16),
@@ -76,7 +96,6 @@ class ClaimStatusWidget extends StatelessWidget {
               const SizedBox(height: 8),
               Text(description, style: AppTextTheme.paragraph),
 
-              // ✅ Show badge if available
               if (hasBadge && badgeText.isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Container(

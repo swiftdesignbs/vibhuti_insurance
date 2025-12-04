@@ -15,25 +15,15 @@ class AppBarUtils {
     return AppBar(
       iconTheme: const IconThemeData(color: Colors.black),
       backgroundColor: AppTextTheme.appBarColor,
+      titleSpacing: 0, 
       title: showWelcomeText
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Welcome",
-                  style: AppTextTheme.pageTitle.copyWith(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                Text(
-                  userName ?? "User Name",
-                  style: AppTextTheme.pageTitle.copyWith(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+          ? Text(
+              "Welcome, ${userName ?? "User Name"}",
+              style: AppTextTheme.pageTitle.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+              overflow: TextOverflow.ellipsis,
             )
           : Text(
               screenTitle,
@@ -42,6 +32,7 @@ class AppBarUtils {
                 fontWeight: FontWeight.w600,
               ),
             ),
+
       automaticallyImplyLeading: showImplyingIcon,
       leading: scaffoldKey != null
           ? IconButton(

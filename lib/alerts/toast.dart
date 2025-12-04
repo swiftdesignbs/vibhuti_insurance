@@ -7,7 +7,11 @@ class CustomToast {
     bool success = true,
     int duration = 3,
   }) {
-    final overlay = Overlay.of(context);
+    // Always get overlay from root navigator (safe)
+    final overlay = Navigator.of(context, rootNavigator: true).overlay;
+
+    if (overlay == null) return; // safety
+
     final overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
         top: MediaQuery.of(context).padding.top + 20,
@@ -30,7 +34,6 @@ class CustomToast {
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
                   success ? Icons.check_circle : Icons.error,
@@ -42,7 +45,7 @@ class CustomToast {
                   child: Text(
                     message,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       color: Colors.white,
                       fontWeight: FontWeight.w500,
                     ),
@@ -56,10 +59,8 @@ class CustomToast {
       ),
     );
 
-    // Insert the overlay
     overlay.insert(overlayEntry);
 
-    // Remove after duration
     Future.delayed(Duration(seconds: duration), () {
       overlayEntry.remove();
     });

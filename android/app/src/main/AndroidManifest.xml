@@ -1,9 +1,39 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"> 
-    <uses-permission android:name="android.permission.INTERNET" />
+<!-- Required for file download -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+<!-- For Android below 10 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
+
+<!-- Android 13+ -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_DOCUMENTS" />
+
+
+
+
     <application
         android:label="vibhuti_insurance_mobile_app"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+        <!-- Flutter Downloader -->
+    <meta-data
+        android:name="flutter_downloader_max_concurrent_tasks"
+        android:value="5" />
+
+    <provider
+        android:name="vn.hunghd.flutterdownloader.DownloadedFileProvider"
+        android:authorities="${applicationId}.flutter_downloader.provider"
+        android:exported="false"
+        android:grantUriPermissions="true">
+    <meta-data
+        android:name="android.support.FILE_PROVIDER_PATHS"
+        android:resource="@xml/flutter_downloader_provider_paths"/>
+    </provider>
         <activity
             android:name=".MainActivity"
             android:exported="true"

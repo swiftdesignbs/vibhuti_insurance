@@ -23,17 +23,17 @@ class Buttons extends StatelessWidget {
   Widget build(BuildContext context) {
     final textScale = MediaQuery.of(context).textScaleFactor;
     return Container(
-      decoration: BoxDecoration(
-        color: AppTextTheme.primaryColor,
-        borderRadius: BorderRadius.circular(50),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF2D7C78),
-            offset: const Offset(6, 6),
-            blurRadius: 0,
-          ),
-        ],
-      ),
+      // decoration: BoxDecoration(
+      //   color: AppTextTheme.primaryColor,
+      //   borderRadius: BorderRadius.circular(50),
+      //   boxShadow: [
+      //     BoxShadow(
+      //       color: Color(0XFF00635F),
+      //       offset: const Offset(6, 6),
+      //       blurRadius: 0,
+      //     ),
+      //   ],
+      // ),
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
@@ -69,11 +69,6 @@ class Buttons extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
 
 class FilterButtons extends StatelessWidget {
   final double width;

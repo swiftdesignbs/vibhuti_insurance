@@ -26,13 +26,13 @@ class AdmibBtn extends StatelessWidget {
       decoration: BoxDecoration(
         color: Color(0xff004370),
         borderRadius: BorderRadius.circular(50),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black,
-            offset: const Offset(6, 6),
-            blurRadius: 1,
-          ),
-        ],
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: Colors.black,
+        //     offset: const Offset(6, 6),
+        //     blurRadius: 1,
+        //   ),
+        // ],
       ),
       child: ElevatedButton(
         onPressed: onPressed,

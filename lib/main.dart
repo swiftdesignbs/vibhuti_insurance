@@ -1,20 +1,83 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:get/get.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/booking_screen.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/dashboard_screen.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/main_screen.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/splash_screen.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:vibhuti_insurance_mobile_app/local_storage/secure_storage.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/employee/employee_booking_module/booking_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/employee/dashboard/dashboard_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/employee/dashboard/main_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/login/splash_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/state_management/state_management.dart';
+import 'package:vibhuti_insurance_mobile_app/utils/app_life_cycle.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 import 'package:device_preview_plus/device_preview_plus.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Initialize lifecycle
+  final appLifecycleService = AppLifecycleService();
+  appLifecycleService.init();
+
+  /// REQUEST PERMISSIONS HERE
+  await _askPermissions();
+  await FlutterDownloader.initialize(debug: true, ignoreSsl: true);
+
+  final controller = Get.put(StateController());
+  await controller.initAuth();
+
+  // ---- FORCE AUTO LOGOUT ON APP RESTART ----
+  final token = await getAuthToken();
+  if (token != null && token.toString().isNotEmpty) {
+    // user had active session before app kill — force logout
+    await controller.unsetAuth();
+  }
   runApp(MyApp());
 }
-// void main() => runApp(
-//   DevicePreview(
-//     builder: (context) => MyApp(), // Wrap your app
-//   ),
-// );
+
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   // Initialize lifecycle
+//   final appLifecycleService = AppLifecycleService();
+//   appLifecycleService.init();
+
+//   /// REQUEST PERMISSIONS HERE
+//   await _askPermissions();
+//   await FlutterDownloader.initialize(debug: true, ignoreSsl: true);
+
+//   final controller = Get.put(StateController());
+//   await controller.initAuth();
+
+//   // ---- FORCE AUTO LOGOUT ON APP RESTART ----
+//   final token = await getAuthToken();
+//   if (token != null && token.toString().isNotEmpty) {
+//     // user had active session before app kill — force logout
+//     await controller.unsetAuth();
+//   }
+
+//   runApp(DevicePreview(builder: (context) => MyApp()));
+// }
+
+Future<void> _askPermissions() async {
+  /// STORAGE PERMISSION (Android 13+ uses Photos & Videos)
+  if (await Permission.storage.isDenied) {
+    await Permission.storage.request();
+  }
+
+  /// MANAGE EXTERNAL STORAGE (for full download access)
+  if (await Permission.manageExternalStorage.isDenied) {
+    await Permission.manageExternalStorage.request();
+  }
+
+  /// LOCATION PERMISSION (if needed)
+  if (await Permission.location.isDenied) {
+    await Permission.location.request();
+  }
+
+  /// NOTIFICATION permission (Downloader needs it on Android 13)
+  if (await Permission.notification.isDenied) {
+    await Permission.notification.request();
+  }
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -48,7 +111,6 @@ class MyApp extends StatelessWidget {
           backgroundColor: Color(0xFF00B3AC),
           foregroundColor: Colors.white,
         ),
-
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF00B3AC),
@@ -59,13 +121,11 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-
         textSelectionTheme: const TextSelectionThemeData(
           cursorColor: Color(0xFF00B3AC),
           selectionColor: Color(0x3300B3AC),
           selectionHandleColor: Color(0xFF00B3AC),
         ),
-
         inputDecorationTheme: InputDecorationTheme(
           focusedBorder: OutlineInputBorder(
             borderSide: const BorderSide(color: Color(0xFF00B3AC)),

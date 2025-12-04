@@ -58,11 +58,11 @@ class CustomTextField extends StatelessWidget {
               hintText: hintText,
               suffixIcon: suffixIcon != null
                   ? Padding(
-                      padding: const EdgeInsets.all(12.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 18),
                       child: SvgPicture.asset(
                         suffixIcon!,
-                        height: 16,
-                        width: 16,
+                        height: 20,
+                        width: 20,
                       ),
                     )
                   : null,

@@ -3,11 +3,11 @@ import 'dart:ui';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/admin/admin_claim_history.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/admin/booking_list_screen.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/admin/client_screen.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/admin/employee_screen.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/login_selection.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/admin/claim_history/admin_claim_history.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/admin/booking_module/admin_booking_list_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/admin/client_module/admin_client_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/admin/employee_module/employee_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/login/login_selection.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/app_bar.dart';
 
@@ -63,6 +63,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   void _showHealthCardBottomSheet() {
     showModalBottomSheet(
+      useRootNavigator: true,
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -403,31 +404,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       horizontal: 16,
                       vertical: 18,
                     ),
-                    decoration: index == 0
-                        ? BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: AppTextTheme.primaryColor,
-                              width: 1,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black,
-                                offset: Offset(3, 4),
-                                blurRadius: 0,
-                                spreadRadius: 1,
-                              ),
-                            ],
-                          )
-                        : BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: Color(0xFF00635F),
-                              width: 1.5,
-                            ),
-                          ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Color(0xFF00635F), width: 1.5),
+                    ),
                     child: Row(
                       children: [
                         Container(

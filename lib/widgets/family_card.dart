@@ -24,7 +24,7 @@ Widget familyCard({
             boxShadow: [
               BoxShadow(
                 color: Color(0XFF00635F),
-                offset: const Offset(4, 4),
+                offset: const Offset(2, 2),
                 blurRadius: 0,
               ),
             ],
@@ -33,7 +33,7 @@ Widget familyCard({
           child: CircleAvatar(
             radius: 16,
             backgroundColor: AppTextTheme.primaryColor,
-            child: SvgPicture.asset(iconPath, height: 24, width: 24),
+            child: SvgPicture.asset(iconPath, height: 22, width: 22),
             // child: SvgPicture.asset(iconPath, height: 24, width: 24),
           ),
         ),

@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
-import 'package:vibhuti_insurance_mobile_app/screens/booking_screen.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/claim_history.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/dashboard_screen.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/health_claims.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/login_selection.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/wellness_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/employee/employee_booking_module/booking_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/employee/claim_history/claim_history.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/employee/dashboard/dashboard_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/employee/health_claims/health_claims.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/login/login_selection.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/employee/wellness_module/wellness_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/state_management/state_management.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 
-class AppDrawer extends StatelessWidget {
+class AppDrawer extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
   final PersistentTabController? controller;
   final BuildContext parentContext; // 👈 Add this
@@ -21,6 +23,21 @@ class AppDrawer extends StatelessWidget {
     this.controller,
     required this.parentContext, // 👈 Required
   });
+
+  @override
+  State<AppDrawer> createState() => _AppDrawerState();
+}
+
+class _AppDrawerState extends State<AppDrawer> {
+  final dataController = Get.put(StateController());
+
+  logout() async {
+    try {
+      await dataController.unsetAuth();
+    } catch (err) {}
+
+    Get.offAll(() => const LoginSelection());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +98,7 @@ class AppDrawer extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                'Krishnan Murthy',
+                                '${dataController.authUserProfileData['employeeName']}',
                                 style: AppTextTheme.pageTitle.copyWith(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
@@ -99,7 +116,7 @@ class AppDrawer extends StatelessWidget {
                     right: 10,
                     child: IconButton(
                       onPressed: () {
-                        scaffoldKey.currentState?.closeDrawer();
+                        widget.scaffoldKey.currentState?.closeDrawer();
                       },
                       icon: const Icon(
                         Icons.close,
@@ -133,11 +150,11 @@ class AppDrawer extends StatelessWidget {
                     title: 'Wellness Services',
                     iconPath: 'assets/icons/wellness.svg',
                     onTap: () {
-                      scaffoldKey.currentState?.closeDrawer();
+                      widget.scaffoldKey.currentState?.closeDrawer();
 
                       Future.delayed(const Duration(milliseconds: 250), () {
                         PersistentNavBarNavigator.pushNewScreen(
-                          parentContext, // 👈 use main screen context
+                          widget.parentContext, // 👈 use main screen context
                           screen: WellnessServicesScreen(
                             scaffoldKey: GlobalKey<ScaffoldState>(),
                           ),
@@ -152,11 +169,11 @@ class AppDrawer extends StatelessWidget {
                     title: 'Booking List',
                     iconPath: 'assets/icons/booking_list.svg',
                     onTap: () {
-                      scaffoldKey.currentState?.closeDrawer();
+                      widget.scaffoldKey.currentState?.closeDrawer();
 
                       Future.delayed(const Duration(milliseconds: 250), () {
                         PersistentNavBarNavigator.pushNewScreen(
-                          parentContext,
+                          widget.parentContext,
                           screen: BookingScreen(
                             scaffoldKey: GlobalKey<ScaffoldState>(),
                           ),
@@ -173,11 +190,11 @@ class AppDrawer extends StatelessWidget {
                     title: 'Health Claims',
                     iconPath: 'assets/icons/health_claims.svg',
                     onTap: () {
-                      scaffoldKey.currentState?.closeDrawer();
+                      widget.scaffoldKey.currentState?.closeDrawer();
 
                       Future.delayed(const Duration(milliseconds: 250), () {
                         PersistentNavBarNavigator.pushNewScreen(
-                          parentContext, // 👈 use main screen context
+                          widget.parentContext, // 👈 use main screen context
                           screen: HealthClaims(
                             scaffoldKey: GlobalKey<ScaffoldState>(),
                           ),
@@ -198,7 +215,7 @@ class AppDrawer extends StatelessWidget {
                   ),
                   drawerMenuItem(
                     title: 'Wallet',
-                    iconPath: 'assets/icons/wallet.svg',
+                    iconPath: 'assets/icons/wallets.svg',
                     onTap: () {},
                   ),
                   SizedBox(height: 20),
@@ -219,14 +236,14 @@ class AppDrawer extends StatelessWidget {
   }
 
   void _navigateToTab(int index) {
-    scaffoldKey.currentState?.closeDrawer();
-    if (controller != null) {
-      controller!.jumpToTab(index);
+    widget.scaffoldKey.currentState?.closeDrawer();
+    if (widget.controller != null) {
+      widget.controller!.jumpToTab(index);
     }
   }
 
   void displayLogOutModal(BuildContext context) {
-    scaffoldKey.currentState?.closeDrawer();
+    widget.scaffoldKey.currentState?.closeDrawer();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -248,11 +265,7 @@ class AppDrawer extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginSelection()),
-                );
+                logout();
               },
               child: Text(
                 'Logout',

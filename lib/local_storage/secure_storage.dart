@@ -22,6 +22,9 @@ Future saveAuthToken(token) async {
 Future saveAuthUser(data) async {
   return await save('AUTH_USER', jsonEncode(data));
 }
+Future saveAuthUserProfileData(data) async {
+  return await save('AUTH_USER_PROFILE_DATA', jsonEncode(data));
+}
 
 Future saveFirebaseToken(data) async {
   print("hello FirebaseToken is $data");
@@ -42,6 +45,16 @@ Future getAuthUser() async {
     return userNew;
   }
 }
+Future getAuthUserProfileData() async {
+  var user = await getValue('AUTH_USER_PROFILE_DATA');
+  if (user != '') {
+    return jsonDecode(user);
+  } else {
+    var userNew = {};
+    await saveAuthUserProfileData(userNew);
+    return userNew;
+  }
+}
 
 Future getFirebaseToken() async {
   return await getValue('FIREBASE_TOKEN');
@@ -49,6 +62,9 @@ Future getFirebaseToken() async {
 
 Future deleteAuthUser() async {
   await secureStorage.delete(key: 'AUTH_USER');
+}
+Future deleteAuthUserProfileData() async {
+  await secureStorage.delete(key: 'AUTH_USER_PROFILE_DATA');
 }
 
 Future deleteAuthToken() async {
