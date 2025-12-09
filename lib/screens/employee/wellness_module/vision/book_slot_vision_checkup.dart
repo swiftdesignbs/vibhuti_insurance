@@ -83,7 +83,8 @@ class _BookSlotVisionCheckUpScreenState
     BuildContext context,
     Map<String, dynamic> package,
   ) {
-    showModalBottomSheet(useRootNavigator: true,
+    showModalBottomSheet(
+      useRootNavigator: true,
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -214,7 +215,8 @@ class _BookSlotVisionCheckUpScreenState
         scaffoldKey: widget.scaffoldKey,
         showImplyingIcon: true,
         showWelcomeText: false,
-      ),   backgroundColor: Colors.white,
+      ),
+      backgroundColor: Colors.white,
       // appBar: AppBar(
       //   automaticallyImplyLeading: true,
       //   backgroundColor: AppTextTheme.appBarColor,
@@ -231,7 +233,7 @@ class _BookSlotVisionCheckUpScreenState
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(16),
                 itemCount: testPackage.length,
                 itemBuilder: (context, index) {
                   final test = testPackage[index];
@@ -242,29 +244,11 @@ class _BookSlotVisionCheckUpScreenState
                     //   borderRadius: BorderRadius.circular(20),
                     //   border: Border.all(color: AppTextTheme.primaryColor),
                     // ),
-                    decoration: index == 0
-                        ? BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: AppTextTheme.primaryColor,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0XFF00635F),
-                                // darker teal shadow
-                                offset: const Offset(6, 6), // shadow position
-                                blurRadius: 0,
-                              ),
-                            ],
-                          )
-                        : BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: AppTextTheme.primaryColor,
-                            ),
-                          ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(23),
+                      border: Border.all(color: AppTextTheme.primaryColor),
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -286,30 +270,32 @@ class _BookSlotVisionCheckUpScreenState
                                       style: AppTextTheme.subTitle,
                                     ),
                                   ),
-                                    Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade200,
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade200,
 
-                                        borderRadius: BorderRadius.circular(15),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(6.0),
-                                        child: Text(
-                                          "Offer price",
-                                          style: AppTextTheme.paragraph,
+                                          borderRadius: BorderRadius.circular(
+                                            15,
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(6.0),
+                                          child: Text(
+                                            "Offer price",
+                                            style: AppTextTheme.paragraph,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    SizedBox(height: 2),
-                                    Text(
-                                      "₹${test['price']}",
-                                      style: AppTextTheme.subTitle,
-                                    ),
-                                  ],
-                                ),
+                                      SizedBox(height: 2),
+                                      Text(
+                                        "₹${test['price']}",
+                                        style: AppTextTheme.subTitle,
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 6),

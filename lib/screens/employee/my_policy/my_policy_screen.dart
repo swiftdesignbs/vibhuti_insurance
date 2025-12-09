@@ -35,8 +35,13 @@ import 'package:vibhuti_insurance_mobile_app/screens/notification.dart';
 
 class MyPolicyScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState>? scaffoldKey;
+  //  final String? initialPolicyNo; // ← ADD THIS
 
-  const MyPolicyScreen({super.key, this.scaffoldKey});
+  const MyPolicyScreen({
+    super.key,
+    this.scaffoldKey,
+    // this.initialPolicyNo,
+  }); // ← AND THIS
 
   @override
   State<MyPolicyScreen> createState() => _MyPolicyScreenState();
@@ -522,15 +527,27 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
                             ),
 
                             const SizedBox(height: 20),
+  Text(
+                              "Policy Documents",
+                              style: AppTextTheme.subTitle.copyWith(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                            ),
 
+                            SizedBox(height: 10),
                             // Download buttons
                             DottedBorderBtn(
-                              label: "Health Card",
+                              label: isDownloadingDoc
+                                  ? "Please wait..."
+                                  : "Health Card",
                               iconPath: 'assets/icons/download_green.svg',
                               height: 50,
-                              onPressed: () {
-                                downloadHealthCard(context);
-                              },
+                              onPressed: isDownloadingDoc
+                                  ? null
+                                  : () {
+                                      downloadHealthCard(context);
+                                    },
                             ),
 
                             const SizedBox(height: 16),
@@ -540,17 +557,9 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
                             //   height: 50,
                             //   onPressed: () {},
                             // ),
-                            SizedBox(height: 16),
 
-                            Text(
-                              "Policy Documents",
-                              style: AppTextTheme.subTitle.copyWith(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                            ),
 
-                            SizedBox(height: 10),
+                          
 
                             FutureBuilder(
                               future: getPolicyDocuments(policyNumber),
@@ -560,9 +569,6 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
                                   return Center(
                                     child: CircularProgressIndicator(),
                                   );
-
-                                if (!snapshot.hasData || snapshot.data!.isEmpty)
-                                  return Text("No documents available");
 
                                 return buildDocumentButtons(snapshot.data!);
                               },
@@ -582,7 +588,7 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
                               ],
                             ),
                             SizedBox(height: 5),
-                            PolicyBenefitsCard(),
+                            PolicyBenefitsCard(policyNo: policyNumber),
                             SizedBox(height: 30),
                           ],
                         ),
@@ -797,7 +803,7 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
         return null;
       }
       final result = response["Result"];
-
+      print("➡ Result: $result");
       if (result is List && result.isNotEmpty) {
         final Map<String, dynamic> profileData = result[0];
         print("PROFILE DETAILS EXTRACTED SUCCESSFULLY FROM LIST");
@@ -827,7 +833,7 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
   }
 
   ScrollController scrollController = ScrollController();
-
+  bool isDownloading = false;
   Future<void> downloadHealthCard(BuildContext context) async {
     final token = controllers.authToken.toString();
     if (token == null || token.toString().trim().isEmpty) {
@@ -839,7 +845,9 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
       return;
     }
     print("🔽 downloadManual() called");
-
+    setState(() {
+      isDownloading = true;
+    });
     try {
       // -------------------------------------------------
       // 1️⃣ API 1 → Get HealthCardPath (PDF path)
@@ -905,7 +913,7 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
         print("❌ ERROR: fileData is empty!");
         CustomToast.show(
           context: context,
-          message: "Invalid file data",
+          message: res2?["ErrorMessage"] ?? "Invalid file data",
           success: false,
         );
         return;
@@ -946,6 +954,10 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
         message: "Something went wrong",
         success: false,
       );
+    } finally {
+      setState(() {
+        isDownloading = false;
+      });
     }
   }
 
@@ -988,6 +1000,7 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
     }
   }
 
+  bool isDownloadingDoc = false;
   Future<void> downloadDocument(BuildContext context, String filePath) async {
     final token = controllers.authToken.toString();
     if (token == null || token.toString().trim().isEmpty) {
@@ -998,6 +1011,9 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
       Get.offAll(() => LoginSelection());
       return;
     }
+    setState(() {
+      isDownloadingDoc = true;
+    });
     const url = "$baseUrl/api/Account/DownloadDocument";
 
     try {
@@ -1040,6 +1056,10 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
       );
     } catch (e) {
       print("Download error: $e");
+    } finally {
+      setState(() {
+        isDownloadingDoc = false;
+      });
     }
   }
 
@@ -1048,16 +1068,20 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
       children: docs.map((doc) {
         final name = doc['DocumentName'] ?? 'Document';
         final path = doc['DocumentPath'] ?? '';
-
+        //isDownloading
+        //   ? "Please wait..."
+        //   : "Download user manual",
         return Column(
           children: [
             DottedBorderBtn(
-              label: name,
+              label: isDownloading ? "Please wait..." : name,
               iconPath: 'assets/icons/download_green.svg',
               height: 50,
-              onPressed: () {
-                downloadDocument(Get.context!, path);
-              },
+              onPressed: isDownloading
+                  ? null
+                  : () {
+                      downloadDocument(Get.context!, path);
+                    },
             ),
             SizedBox(height: 12),
           ],
@@ -1117,6 +1141,17 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
 
     getMyPolicies(isInitialLoad: true);
     fetchDependentData();
+    // ← ADD THIS BLOCK: Auto-open details if policyNo was passed
+    // if (widget.initialPolicyNo != null && widget.initialPolicyNo!.isNotEmpty) {
+    //   WidgetsBinding.instance.addPostFrameCallback((_) {
+    //     String employeeId = controllers.authUser['employeeId'].toString();
+    //     _showPackageDetailsBottomSheet(
+    //       context,
+    //       employeeId,
+    //       widget.initialPolicyNo!,
+    //     );
+    //   });
+    // }
   }
 
   Future<void> fetchDependentData() async {
@@ -1269,7 +1304,7 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
 
                           final policy = policyList[index];
                           return Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 0, 8, 12),
+                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 12),
                             child: Container(
                               height: 150,
                               // decoration: BoxDecoration(
@@ -1334,44 +1369,60 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
                                           MainAxisAlignment.start,
 
                                       children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: Color(0XffD8E9F1),
-                                            borderRadius: BorderRadius.circular(
-                                              15,
+                                        Expanded(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: Color(0XffD8E9F1),
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
                                             ),
-                                          ),
 
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              '${policy['PolicyName'] ?? 'N/A'}',
-                                              style: AppTextTheme.paragraph
-                                                  .copyWith(
-                                                    fontWeight: FontWeight.w600,
-                                                    color: Color(0Xff00635F),
-                                                  ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(
+                                                8.0,
+                                              ),
+                                              child: Text(
+                                                '${policy['PolicyName'] ?? 'N/A'}',
+                                                textAlign: TextAlign.center,
+                                                style: AppTextTheme.paragraph
+                                                    .copyWith(
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Color(0Xff00635F),
+                                                    ),
+                                              ),
                                             ),
                                           ),
                                         ),
                                         SizedBox(width: 10),
 
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: Color(0XffD8E9F1),
-                                            borderRadius: BorderRadius.circular(
-                                              15,
+                                        Expanded(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: Color(0XffD8E9F1),
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
                                             ),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              '${policy['PolicyNo'] ?? 'N/A'}',
-                                              style: AppTextTheme.paragraph
-                                                  .copyWith(
-                                                    fontWeight: FontWeight.w600,
-                                                    color: Color(0Xff00635F),
-                                                  ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(
+                                                8.0,
+                                              ),
+                                              child: Text(
+                                                '${policy['PolicyNo'] ?? 'N/A'}',
+                                                textAlign: TextAlign.center,
+
+                                                style: AppTextTheme.paragraph
+                                                    .copyWith(
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Color(0Xff00635F),
+                                                    ),
+                                              ),
                                             ),
                                           ),
                                         ),

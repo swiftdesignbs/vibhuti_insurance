@@ -201,7 +201,6 @@ class _EmployeeScreenPT1State extends State<EmployeeScreenPT1> {
               Text("Employee Dependent", style: AppTextTheme.subTitle),
               SizedBox(height: 5),
               FamilyCardTwo(
-                iconPath: "assets/icons/circle-user.svg",
                 name: "Kaushal Patel",
                 dob: "12 Jul 2000",
                 dependent: "Son",
@@ -209,7 +208,6 @@ class _EmployeeScreenPT1State extends State<EmployeeScreenPT1> {
               ),
 
               FamilyCardTwo(
-                iconPath: "assets/icons/circle-user.svg",
                 name: "Kaushal Patel",
                 dob: "12 Jul 2000",
                 dependent: "Son",
@@ -217,7 +215,6 @@ class _EmployeeScreenPT1State extends State<EmployeeScreenPT1> {
               ),
 
               FamilyCardTwo(
-                iconPath: "assets/icons/circle-user.svg",
                 name: "Kaushal Patel",
                 dob: "12 Jul 2000",
                 dependent: "Son",
@@ -225,7 +222,6 @@ class _EmployeeScreenPT1State extends State<EmployeeScreenPT1> {
               ),
 
               FamilyCardTwo(
-                iconPath: "assets/icons/circle-user.svg",
                 name: "Kaushal Patel",
                 dob: "12 Jul 2000",
                 dependent: "Son",
@@ -233,7 +229,6 @@ class _EmployeeScreenPT1State extends State<EmployeeScreenPT1> {
               ),
 
               FamilyCardTwo(
-                iconPath: "assets/icons/circle-user.svg",
                 name: "Kaushal Patel",
                 dob: "12 Jul 2000",
                 dependent: "Son",

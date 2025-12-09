@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:vibhuti_insurance_mobile_app/state_management/state_management.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/custom_input_with_name.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/custom_textfield.dart';
@@ -13,6 +15,8 @@ class HealthCheckUpFormScreen extends StatefulWidget {
 }
 
 class _HealthCheckUpFormScreenState extends State<HealthCheckUpFormScreen> {
+  final controllers = Get.put(StateController());
+
   bool isChecked = false;
   TextEditingController employeeCodeController = TextEditingController();
   TextEditingController employeeNameController = TextEditingController();
@@ -34,6 +38,82 @@ class _HealthCheckUpFormScreenState extends State<HealthCheckUpFormScreen> {
   TextEditingController availablePlans = TextEditingController();
   TextEditingController planCost = TextEditingController();
   @override
+  void initState() {
+    super.initState();
+    print("Health Check-up Form Screen : ${controllers.authUserProfileData}");
+
+    // Auto-fill the form with user data
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _autoFillFormData();
+    });
+  }
+
+  void _autoFillFormData() {
+    if (controllers.authUserProfileData.isNotEmpty) {
+      setState(() {
+        // Employee Code
+        employeeCodeController.text =
+            controllers.authUserProfileData['employeeCode']?.toString() ?? '';
+
+        // Employee Name
+        String firstName =
+            controllers.authUserProfileData['firstName']?.toString() ?? '';
+        String lastName =
+            controllers.authUserProfileData['lastName']?.toString() ?? '';
+        employeeNameController.text = '$firstName $lastName'.trim();
+
+        // Email ID
+        emailIDController.text =
+            controllers.authUserProfileData['emailAddress']?.toString() ?? '';
+
+        // Mobile No.
+        mobileNoController.text =
+            controllers.authUserProfileData['mobileNo']?.toString() ?? '';
+
+        // Gender
+        genderController.text =
+            controllers.authUserProfileData['genderName']?.toString() ?? '';
+
+        // City
+        cityController.text =
+            controllers.authUserProfileData['cityName']?.toString() ?? '';
+
+        // Pincode
+        pincodeController.text =
+            controllers.authUserProfileData['pinCode']?.toString() ?? '';
+
+        // Policy Type (you might need to get this from another API)
+        // For now, we can set a default or leave empty
+
+        // Patient/Member Name (default to employee name)
+        patientNameController.text = '$firstName $lastName'.trim();
+
+        // Age (calculate from dateOfBirth if available)
+        if (controllers.authUserProfileData['dateOfBirth'] != null) {
+          try {
+            String dobStr = controllers.authUserProfileData['dateOfBirth']
+                .toString();
+            // Parse date and calculate age
+            // This is a simplified version - you might need proper date parsing
+            if (dobStr.contains('-')) {
+              List<String> parts = dobStr.split('-');
+              if (parts.length >= 3) {
+                int? birthYear = int.tryParse(parts[2]);
+                if (birthYear != null) {
+                  int currentYear = DateTime.now().year;
+                  int age = currentYear - birthYear;
+                  ageController.text = age.toString();
+                }
+              }
+            }
+          } catch (e) {
+            print("Error calculating age: $e");
+          }
+        }
+      });
+    }
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -52,10 +132,12 @@ class _HealthCheckUpFormScreenState extends State<HealthCheckUpFormScreen> {
                 controller: employeeCodeController,
                 hintText: "Text",
                 ddName: 'Employee Code',
+                readOnly: true,
               ),
               SizedBox(height: 5),
               CustomTextFieldWithName(
                 keyboardType: TextInputType.text,
+                readOnly: true,
 
                 controller: employeeNameController,
                 hintText: "Text",
@@ -65,6 +147,7 @@ class _HealthCheckUpFormScreenState extends State<HealthCheckUpFormScreen> {
 
               CustomTextFieldWithName(
                 keyboardType: TextInputType.emailAddress,
+                readOnly: true,
 
                 controller: emailIDController,
                 hintText: "Text",
@@ -74,6 +157,7 @@ class _HealthCheckUpFormScreenState extends State<HealthCheckUpFormScreen> {
 
               CustomTextFieldWithName(
                 keyboardType: TextInputType.phone,
+                readOnly: true,
 
                 controller: mobileNoController,
                 hintText: "Text",

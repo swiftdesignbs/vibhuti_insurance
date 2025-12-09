@@ -227,7 +227,7 @@ class _BookSlotDentalCheckUpScreenState
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
 
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
               itemCount: testPackage.length,
               itemBuilder: (context, index) {
                 final test = testPackage[index];

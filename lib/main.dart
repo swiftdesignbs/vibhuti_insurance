@@ -12,28 +12,6 @@ import 'package:vibhuti_insurance_mobile_app/utils/app_life_cycle.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 import 'package:device_preview_plus/device_preview_plus.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  // Initialize lifecycle
-  final appLifecycleService = AppLifecycleService();
-  appLifecycleService.init();
-
-  /// REQUEST PERMISSIONS HERE
-  await _askPermissions();
-  await FlutterDownloader.initialize(debug: true, ignoreSsl: true);
-
-  final controller = Get.put(StateController());
-  await controller.initAuth();
-
-  // ---- FORCE AUTO LOGOUT ON APP RESTART ----
-  final token = await getAuthToken();
-  if (token != null && token.toString().isNotEmpty) {
-    // user had active session before app kill — force logout
-    await controller.unsetAuth();
-  }
-  runApp(MyApp());
-}
-
 // void main() async {
 //   WidgetsFlutterBinding.ensureInitialized();
 //   // Initialize lifecycle
@@ -53,22 +31,41 @@ void main() async {
 //     // user had active session before app kill — force logout
 //     await controller.unsetAuth();
 //   }
-
-//   runApp(DevicePreview(builder: (context) => MyApp()));
+//   runApp(MyApp());
 // }
 
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Initialize lifecycle
+  final appLifecycleService = AppLifecycleService();
+  appLifecycleService.init();
+
+  /// REQUEST PERMISSIONS HERE
+  await _askPermissions();
+  await FlutterDownloader.initialize(debug: true, ignoreSsl: true);
+
+  final controller = Get.put(StateController());
+  await controller.initAuth();
+
+  // ---- FORCE AUTO LOGOUT ON APP RESTART ----
+  final token = await getAuthToken();
+  if (token != null && token.toString().isNotEmpty) {
+    // user had active session before app kill — force logout
+    await controller.unsetAuth();
+  }
+
+  runApp(DevicePreview(builder: (context) => MyApp()));
+}
+
 Future<void> _askPermissions() async {
-  /// STORAGE PERMISSION (Android 13+ uses Photos & Videos)
   if (await Permission.storage.isDenied) {
     await Permission.storage.request();
   }
 
-  /// MANAGE EXTERNAL STORAGE (for full download access)
   if (await Permission.manageExternalStorage.isDenied) {
     await Permission.manageExternalStorage.request();
   }
 
-  /// LOCATION PERMISSION (if needed)
   if (await Permission.location.isDenied) {
     await Permission.location.request();
   }
@@ -83,7 +80,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      // ignore: deprecated_member_use
       useInheritedMediaQuery: true,
       locale: DevicePreview.locale(context),
       builder: DevicePreview.appBuilder,

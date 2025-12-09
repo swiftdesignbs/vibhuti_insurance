@@ -1,14 +1,28 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/employee/wellness_module/health/health_checkup_form.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/login/login_selection.dart';
+import 'package:vibhuti_insurance_mobile_app/state_management/state_management.dart';
+import 'package:vibhuti_insurance_mobile_app/utils/api_service.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
+import 'package:vibhuti_insurance_mobile_app/utils/constant.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/app_bar.dart';
-import 'book_slot_health_checkup_screen.dart'; // make sure you import your BookSlotHealthCheckUpScreen file
 
 class BookSlotHealthCheckUpScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState>? scaffoldKey;
-  const BookSlotHealthCheckUpScreen({super.key, this.scaffoldKey});
+  final String hospitalId;
+  final String pincode;
+  final String selectedGender;
+
+  const BookSlotHealthCheckUpScreen({
+    super.key,
+    this.scaffoldKey,
+    required this.hospitalId,
+    required this.pincode,
+    required this.selectedGender,
+  });
 
   @override
   State<BookSlotHealthCheckUpScreen> createState() =>
@@ -17,68 +31,10 @@ class BookSlotHealthCheckUpScreen extends StatefulWidget {
 
 class _BookSlotHealthCheckUpScreenState
     extends State<BookSlotHealthCheckUpScreen> {
-  final List<Map<String, dynamic>> testPackage = [
-    {
-      "TestName": "Full Body Checkup",
-      "price": 2499,
-      "includedTestCount": 65,
-      "overviewTestName": "Liver, Kidney, Thyroid",
-    },
-    {
-      "TestName": "Diabetes Screening Package",
-      "price": 899,
-      "includedTestCount": 12,
-      "overviewTestName": "Sugar, Lipid, Urine",
-    },
-    {
-      "TestName": "Heart Health Package",
-      "price": 1799,
-      "includedTestCount": 20,
-      "overviewTestName": "ECG, Cholesterol, Enzymes",
-    },
-    {
-      "TestName": "Women Wellness Package",
-      "price": 2199,
-      "includedTestCount": 40,
-      "overviewTestName": "Hormones, Thyroid, Calcium",
-    },
-    {
-      "TestName": "Senior Citizen Health Package",
-      "price": 2999,
-      "includedTestCount": 75,
-      "overviewTestName": "Liver, Kidney, Heart",
-    },
-    {
-      "TestName": "Basic Health Checkup",
-      "price": 699,
-      "includedTestCount": 25,
-      "overviewTestName": "Blood, Sugar, Urine",
-    },
-    {
-      "TestName": "Thyroid Profile",
-      "price": 499,
-      "includedTestCount": 3,
-      "overviewTestName": "T3, T4, TSH",
-    },
-    {
-      "TestName": "Liver Function Test (LFT)",
-      "price": 599,
-      "includedTestCount": 10,
-      "overviewTestName": "Bilirubin, SGPT, SGOT",
-    },
-    {
-      "TestName": "Kidney Function Test (KFT)",
-      "price": 649,
-      "includedTestCount": 8,
-      "overviewTestName": "Urea, Creatinine, Sodium",
-    },
-    {
-      "TestName": "Pre-Employment Health Package",
-      "price": 1299,
-      "includedTestCount": 30,
-      "overviewTestName": "Blood, Urine, X-Ray",
-    },
-  ];
+  final controllers = Get.put(StateController());
+  List<dynamic> testPackage = [];  
+  bool isLoading = true;  
+
   void _showPackageDetailsBottomSheet(
     BuildContext context,
     Map<String, dynamic> package,
@@ -92,10 +48,8 @@ class _BookSlotHealthCheckUpScreenState
         return Stack(
           children: [
             BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4), // amount of blur
-              child: Container(
-                color: Colors.black.withOpacity(0.1), // light transparent layer
-              ),
+              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+              child: Container(color: Colors.black.withOpacity(0.1)),
             ),
             Align(
               alignment: AlignmentGeometry.bottomCenter,
@@ -111,9 +65,8 @@ class _BookSlotHealthCheckUpScreenState
                     ),
                   ),
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+
                       Center(
                         child: Container(
                           height: 5,
@@ -128,9 +81,14 @@ class _BookSlotHealthCheckUpScreenState
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            "Full Body check Up",
-                            style: AppTextTheme.pageTitle,
+                          Expanded(
+                            child: Text(
+                              package['PackageName']?.toString() ??
+                                  'Package Details',
+                              style: AppTextTheme.pageTitle,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                           IconButton(
                             onPressed: () => Navigator.pop(context),
@@ -138,34 +96,41 @@ class _BookSlotHealthCheckUpScreenState
                           ),
                         ],
                       ),
+                      SizedBox(height: 10),
 
-                      const SizedBox(height: 10),
 
                       Expanded(
                         child: SingleChildScrollView(
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              buildBulletPoint(
-                                "Physical evaluation (Height, weight, waist-to-hip, blood pressure, pulse)",
+                              
+                              Text(
+                                "Included Tests:",
+                                style: AppTextTheme.subTitle.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                              buildBulletPoint(
-                                "KFT (Creatinine, blood urea, uric acid)",
-                              ),
-                              buildBulletPoint(
-                                "Thyroid profile (T3 + T4 + TSH)",
-                              ),
-                              buildBulletPoint("CBC with ESR"),
-                              buildBulletPoint("Treadmill test/2D Echo"),
-                              buildBulletPoint("Fasting blood sugar"),
-                              buildBulletPoint("PSA for male"),
-                              buildBulletPoint("HBA1C"),
-                              buildBulletPoint("Vitamin D total"),
-                              buildBulletPoint("USG"),
-                              buildBulletPoint("Chest X Ray"),
-                              buildBulletPoint(
-                                "Doctor consultation - basic eye & basic dental ",
-                              ),
+                              const SizedBox(height: 8),
 
+                              if (package['itemsList'] != null &&
+                                  package['itemsList'] is List)
+                                ...(package['itemsList'] as List).map<Widget>((
+                                  item,
+                                ) {
+                                  return buildBulletPoint(
+                                    item['items']?.toString() ?? '',
+                                  );
+                                }).toList()
+                              else
+                                Center(
+                                  child: Text(
+                                    "No test details available",
+                                    style: AppTextTheme.paragraph,
+                                  ),
+                                ),
+
+                              const SizedBox(height: 20),
                               Text(
                                 "Please Take Note Of The Following Points:",
                                 style: AppTextTheme.subTitle.copyWith(
@@ -173,7 +138,6 @@ class _BookSlotHealthCheckUpScreenState
                                 ),
                               ),
                               const SizedBox(height: 8),
-
                               buildBulletPoint(
                                 "If any above treatment is done along with doctor consultation and medicine, then only it is covered under dental treatment.",
                               ),
@@ -193,7 +157,6 @@ class _BookSlotHealthCheckUpScreenState
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -223,6 +186,73 @@ class _BookSlotHealthCheckUpScreenState
     );
   }
 
+  Future<void> _getTestPackage() async {
+    final token = controllers.authToken.toString();
+    if (token == null || token.toString().trim().isEmpty) {
+      print("Token missing → Redirecting to Login");
+      controllers.authUser.clear();
+      Get.offAll(() => LoginSelection());
+      return;
+    }
+    if (!mounted) return;
+
+    setState(() => isLoading = true);
+
+    final url = '$baseUrl/api/WellnessAPI/WellnessGetPlanDetails';
+
+    final body = {
+      "HostpitalId": widget.hospitalId.toString(),
+      "Pincode": widget.pincode.toString(),
+      "PackageFor": widget.selectedGender,
+      "EmployeeId": controllers.authUserProfileData['employeeId'].toString(),
+      "CompanyId": controllers.authUserProfileData['companyId'].toString(),
+    };
+
+    print("API Request Body: $body");
+
+    try {
+      final response = await ApiService.postRequest(
+        url: url,
+        body: body,
+        token: token,
+      );
+
+      if (!mounted) return;
+
+      print("API Response: $response");
+
+      if (response!['IsError'] == false && response['Result'] != null) {
+        setState(() {
+          testPackage = response['Result'];
+          print("testPackage: $testPackage");
+
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          testPackage = [];
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("Exception in _getTestPackage: $e");
+      if (!mounted) return;
+      setState(() {
+        testPackage = [];
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    print("hospitalId: ${widget.hospitalId}");
+    print("pincode: ${widget.pincode}");
+    print("selectedGender: ${widget.selectedGender}");
+    _getTestPackage();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -234,12 +264,6 @@ class _BookSlotHealthCheckUpScreenState
         showWelcomeText: false,
       ),
       backgroundColor: Colors.white,
-      // appBar: AppBar(
-      //   automaticallyImplyLeading: true,
-      //   backgroundColor: AppTextTheme.appBarColor,
-      //   title: Text("Book Slot", style: AppTextTheme.pageTitle),
-      //   iconTheme: const IconThemeData(color: Colors.black),
-      // ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.only(
@@ -247,162 +271,213 @@ class _BookSlotHealthCheckUpScreenState
           ),
           child: Column(
             children: [
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(12),
-                itemCount: testPackage.length,
-                itemBuilder: (context, index) {
-                  final test = testPackage[index];
 
-                  return Container(
-                    margin: const EdgeInsets.symmetric(vertical: 6),
-                    // decoration: BoxDecoration(
-                    //   borderRadius: BorderRadius.circular(20),
-                    //   border: Border.all(color: AppTextTheme.primaryColor),
-                    // ),
-                    decoration:  BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: AppTextTheme.primaryColor,
+              if (isLoading)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 100),
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+
+              else if (testPackage.isEmpty)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 100),
+                    child: Text(
+                      "No test packages available",
+                      style: AppTextTheme.subTitle,
+                    ),
+                  ),
+                )
+
+              else
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(16),
+                  itemCount: testPackage.length,
+                  itemBuilder: (context, index) {
+                    final test = testPackage[index];
+
+                    return Container(
+                      margin: const EdgeInsets.symmetric(vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AppTextTheme.primaryColor),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
                             ),
-                          ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      test['TestName'],
-                                      style: AppTextTheme.subTitle,
-                                    ),
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey.shade200,
-
-                                          borderRadius: BorderRadius.circular(
-                                            15,
-                                          ),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(6.0),
-                                          child: Text(
-                                            "Offer price",
-                                            style: AppTextTheme.paragraph,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: 2),
-                                      Text(
-                                        "₹${test['price']}",
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        test['PackageName']?.toString() ??
+                                            'Test Package',
                                         style: AppTextTheme.subTitle,
                                       ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 6),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade200,
-
-                                  borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey.shade200,
+                                            borderRadius: BorderRadius.circular(
+                                              15,
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(6.0),
+                                            child: Text(
+                                              "Offer price",
+                                              style: AppTextTheme.paragraph,
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 2),
+                                        Text(
+                                          "₹${test['MRP']?.toStringAsFixed(0) ?? '0'}",
+                                          style: AppTextTheme.subTitle,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(6.0),
-                                  child: Text(
-                                    "Includes ${test['includedTestCount']} Tests",
-                                    style: AppTextTheme.paragraph.copyWith(
-                                      color: AppTextTheme.primaryColor,
-                                      fontWeight: FontWeight.bold,
+                                const SizedBox(height: 6),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Color(0xFFD8E9F1),
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
+                                    ),
+                                    child: Text(
+                                      "Includes ${test['itemsList']?.length?.toString() ?? '0'} Tests",
+                                      style: AppTextTheme.paragraph.copyWith(
+                                        color: Color(0xFF00635F),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 4,
+                                  children: [
+                                    for (var item
+                                        in test['itemsList']?.take(2) ?? [])
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Container(
+                                            width: 6,
+                                            height: 6,
+                                            decoration: BoxDecoration(
+                                              color: AppTextTheme.primaryColor,
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                          SizedBox(width: 4),
+                                          Flexible(
+                                            child: Text(
+                                              item['items']?.toString() ?? '',
+                                              style: AppTextTheme.paragraph,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    if ((test['itemsList']?.length ?? 0) > 2)
+                                      Text(
+                                        '...',
+                                        style: AppTextTheme.paragraph,
+                                      ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: InkWell(
+                                  onTap: () {
+                                    _showPackageDetailsBottomSheet(
+                                      context,
+                                      test,
+                                    );
+                                  },
+                                  child: Container(
+                                    height: 45,
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFF7BD9D6),
+                                      borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(20),
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        'Know More',
+                                        style: AppTextTheme.buttonText,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 6),
-                              Text(
-                                "Includes: ${test['overviewTestName']}",
-                                style: AppTextTheme.paragraph,
+                              Expanded(
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const HealthCheckUpFormScreen(),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    height: 45,
+                                    decoration: BoxDecoration(
+                                      color: Color(0xFF00B3AC),
+                                      borderRadius: const BorderRadius.only(
+                                        bottomRight: Radius.circular(20),
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        'Book Package',
+                                        style: AppTextTheme.buttonText,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
-                        ),
-
-                        Row(
-                          children: [
-                            Expanded(
-                              child: InkWell(
-                                onTap: () {
-                                  _showPackageDetailsBottomSheet(context, test);
-                                },
-                                child: Container(
-                                  height: 45,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFF7BD9D6),
-                                    borderRadius: BorderRadius.only(
-                                      bottomLeft: Radius.circular(20),
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      'Know More',
-                                      style: AppTextTheme.buttonText,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const HealthCheckUpFormScreen(),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  height: 45,
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFF00B3AC),
-                                    borderRadius: const BorderRadius.only(
-                                      bottomRight: Radius.circular(20),
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      'Book Package',
-                                      style: AppTextTheme.buttonText,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
             ],
           ),
         ),

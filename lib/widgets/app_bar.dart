@@ -15,7 +15,7 @@ class AppBarUtils {
     return AppBar(
       iconTheme: const IconThemeData(color: Colors.black),
       backgroundColor: AppTextTheme.appBarColor,
-      titleSpacing: 0, 
+      titleSpacing: 0,
       title: showWelcomeText
           ? Text(
               "Welcome, ${userName ?? "User Name"}",

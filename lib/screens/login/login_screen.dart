@@ -332,9 +332,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     enabled: !isCompanyCodeValidated,
                     onChanged: (value) {
                       final trimmedValue = value.trim();
-                      final isValidLength = trimmedValue.length == 5;
 
-                      // Update controller with trimmed value (optional, if you want to keep it clean)
+                      // Minimum 4 characters, maximum 5 (or adjust as needed)
+                      final hasMinimumLength = trimmedValue.length >= 4;
+                      final isValidLength =
+                          trimmedValue.length >= 4 && trimmedValue.length <= 5;
+
+                      // Update controller with trimmed value
                       if (companyCodeController.text != trimmedValue) {
                         companyCodeController.value = TextEditingValue(
                           text: trimmedValue,
@@ -343,9 +347,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         );
                       }
-                      if (isValidLength && !isCompanyCodeValidated) {
+
+                      // Trigger API when user has entered minimum required characters
+                      if (hasMinimumLength && !isCompanyCodeValidated) {
                         fetchLoginConfig(); // Call your API here
-                      } else if (!isValidLength && isCompanyCodeValidated) {
+                      } else if (trimmedValue.length < 4 &&
+                          isCompanyCodeValidated) {
+                        // Reset validation if length becomes less than minimum
                         setState(() {
                           isCompanyCodeValidated = false;
                         });

@@ -7,7 +7,9 @@ import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/constant.dart';
 
 class PolicyBenefitsCard extends StatefulWidget {
-  const PolicyBenefitsCard({super.key});
+  final String policyNo;
+
+  const PolicyBenefitsCard({super.key, required this.policyNo});
 
   @override
   State<PolicyBenefitsCard> createState() => _PolicyBenefitsCardState();
@@ -37,8 +39,8 @@ class _PolicyBenefitsCardState extends State<PolicyBenefitsCard>
 
     final body = {
       "Action": "GetAllInclusionAndExcluison",
-     // "PolicyNo": "OG-26-1904-8403-00000022",
-      "PolicyNo": "1234",
+      // "PolicyNo": "OG-26-1904-8403-00000022",
+      "PolicyNo": widget.policyNo.toString(),
     };
 
     print("🌐 API Call → $url");
@@ -81,6 +83,7 @@ class _PolicyBenefitsCardState extends State<PolicyBenefitsCard>
   @override
   void initState() {
     super.initState();
+    print("policy no in benefits card: ${widget.policyNo}");
     _tabController = TabController(length: 3, vsync: this);
     fetchBenefits();
     _tabController.addListener(() {

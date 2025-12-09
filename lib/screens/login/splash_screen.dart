@@ -20,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
       Get.off(
         () => LoginSelection(),
         transition: Transition.fadeIn,
-        duration: Duration(milliseconds: 1000),
+        duration: Duration(milliseconds: 2000),
       );
     });
   }

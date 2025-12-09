@@ -25,6 +25,8 @@ import 'package:vibhuti_insurance_mobile_app/utils/api_service.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/constant.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/app_bar.dart';
+import 'package:vibhuti_insurance_mobile_app/widgets/carousel_widget.dart';
+import 'package:vibhuti_insurance_mobile_app/widgets/dotted_border_btn.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/family_card.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/policy_benefit_card.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/quick_links.dart';
@@ -69,7 +71,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       "route": DentalCheckUpScreen(),
     },
     {
-      "icon": "assets/icons/wellness_4.svg",
+      "icon": "assets/icons/wellness2.svg",
       "label": "Vision Checkup",
       "route": VisionCheckUpScreen(),
     },
@@ -109,16 +111,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withOpacity(0.2), // Optional dimming
+      barrierColor: Colors.black.withOpacity(0.2),
 
       builder: (context) {
         return Stack(
           children: [
             BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4), // amount of blur
-              child: Container(
-                color: Colors.black.withOpacity(0.1), // light transparent layer
-              ),
+              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+              child: Container(color: Colors.black.withOpacity(0.1)),
             ),
 
             Align(
@@ -230,7 +230,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       "Action": "GetAllEmpProfileDataFOrHealthCard",
       "CompanyId": controllers.authUserProfileData['companyId'].toString(),
     };
-
+    print(" Body: $body");
     try {
       print(" Fetching Self Policy Data");
       print("➡ EmployeeID: ${controllers.authUser['employeeId']}");
@@ -252,14 +252,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final List result = response["Result"] ?? [];
       print("✅ Received ${result.length} items");
 
-      // Debug: Print all categories
       for (var item in result) {
         print(
           "📝 Item - Category: ${item['CategoryValue']}, Name: ${item['DependentName']}",
         );
       }
 
-      // Find the item with CategoryValue = "Self"
       final selfData = result.firstWhere(
         (item) => item['CategoryValue'] == 'Self',
         orElse: () => null,
@@ -281,6 +279,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  Map<String, dynamic>? profileDetailsData;
   List dependentDataList = [];
 
   Future<List?> getDependentData() async {
@@ -309,7 +308,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (response == null) return null;
       if (response["IsError"] == true) return null;
 
-      return response["Result"] as List?; // <-- IMPORTANT
+      return response["Result"] as List?;
     } catch (e) {
       print("Error: $e");
       return null;
@@ -324,9 +323,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> fetchDependentData() async {
-    final data = await getDependentData(); // call your API function
+    final data = await getDependentData();
 
-    if (!mounted) return; // safety
+    if (!mounted) return;
 
     setState(() {
       dependentDataList = data ?? [];
@@ -345,12 +344,157 @@ class _DashboardScreenState extends State<DashboardScreen> {
       setState(() {
         selfPolicyData = data;
       });
+
+      if (data != null && data['PolicyNo'] != null) {
+        await fetchProfileDetails(
+          controllers.authUser['employeeId'].toString(),
+          data['PolicyNo']!.toString(),
+        );
+      }
+      print("selfPolicyData: $selfPolicyData");
+      print(selfPolicyData?['PolicyNo'] ?? 'No Policy Data');
+      print("profileDetailsData: $profileDetailsData");
+      print("profileDetailsData: ${profileDetailsData?['SumInsured']}");
     } catch (e) {
       print("Error fetching policy data: $e");
     } finally {
       setState(() {
         isLoadingPolicy = false;
       });
+    }
+  }
+
+  Future<void> fetchProfileDetails(String employeeId, String policyNo) async {
+    try {
+      final details = await getProfileDetails(employeeId, policyNo);
+      setState(() {
+        profileDetailsData = details;
+      });
+      print("✅ Profile details loaded: $details");
+      print("✅ Sum Insured from Profile: ${details?['SumInsured']}");
+    } catch (e) {
+      print("Error fetching profile details: $e");
+    }
+  }
+
+  Future<void> downloadHealthCard(BuildContext context) async {
+    final token = controllers.authToken.toString();
+    if (token == null || token.toString().trim().isEmpty) {
+      print("Token missing → Redirecting to Login");
+
+      controllers.authUser.clear();
+
+      Get.offAll(() => LoginSelection());
+      return;
+    }
+    print("🔽 downloadManual() called");
+
+    try {
+      // -------------------------------------------------
+      //   API 1 → Get HealthCardPath (PDF path)
+      // -------------------------------------------------
+      print("📡 API 1 → Fetching HealthCardPath...");
+
+      final url1 = "$baseUrl/api/BCGModule/GetAllProfileEmployeeDetails";
+
+      final body1 = {
+        "Action": "GetAllHealthCardPath",
+        "EmployeeID": controllers.authUser['employeeId'].toString(),
+      };
+
+      final res1 = await ApiService.postRequest(
+        url: url1,
+        body: body1,
+        token: token,
+      );
+      print("✅ API 1 Response: $res1");
+
+      if (res1 == null || res1["Result"] == null || res1["Result"].isEmpty) {
+        CustomToast.show(
+          context: context,
+          message: "Invalid response from server",
+          success: false,
+        );
+        return;
+      }
+
+
+      final manualPath = res1["Result"][0]["HealthCardPath"] ?? "";
+
+      print("📄 HealthCardPath received → $manualPath");
+
+      if (manualPath.isEmpty) {
+        print("❌ ERROR: Manual path empty!");
+        CustomToast.show(
+          context: context,
+          message: "Manual path not found",
+          success: false,
+        );
+        return;
+      }
+
+      // -------------------------------------------------
+      //   API 2 → Fetch actual Base64 PDF
+      // -------------------------------------------------
+      print("📡 API 2 → Fetching actual PDF Base64...");
+
+      final url2 = "$baseUrl/api/Account/DownloadDocument";
+      final body2 = {"File": manualPath};
+
+      final res2 = await ApiService.postRequest(
+        url: url2,
+        body: body2,
+        token: token,
+      );
+      print("✅ API 2 Response: $res2");
+
+      final base64File = res2?["Result"]?["fileData"];
+
+      if (base64File == null || base64File.isEmpty) {
+        print("❌ ERROR: fileData is empty!");
+        CustomToast.show(
+          context: context,
+          message: "Invalid file data",
+          success: false,
+        );
+        return;
+      }
+
+      print("📄 Base64 file received!");
+
+      // -------------------------------------------------
+      //   Decode Base64 → Save PDF
+      // -------------------------------------------------
+      final bytes = base64Decode(base64File);
+
+      // Save into Downloads
+      final directory = Directory("/storage/emulated/0/Download");
+      final filePath = "${directory.path}/HealthCard.pdf";
+      final file = File(filePath);
+
+      await file.writeAsBytes(bytes);
+      print("📁 PDF saved → $filePath");
+
+      CustomToast.show(
+        context: context,
+        message: "Health Card saved in Download folder",
+        success: true,
+      );
+
+      // -------------------------------------------------
+      //   Open PDF
+      // -------------------------------------------------
+      // OpenFile.open(filePath);
+    } catch (e, stack) {
+      print("❌ ERROR in downloadManual()");
+      print("🔍 Exception: $e");
+      print("📌 StackTrace:\n$stack");
+
+      CustomToast.show(
+        context: context,
+        message: "Something went wrong",
+        success: false,
+      );
     }
   }
 
@@ -370,6 +514,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return 'N/A';
   }
 
+  bool isDownloading = false;
+
   Future<void> downloadManual(BuildContext context) async {
     final token = controllers.authToken.toString();
     if (token == null || token.toString().trim().isEmpty) {
@@ -381,7 +527,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       return;
     }
     print("🔽 downloadManual() called");
-
+    setState(() => isDownloading = true);
     try {
       // 1️⃣ API 1 - Get File Path
       print("📡 API 1 → Fetching manual path...");
@@ -459,6 +605,683 @@ class _DashboardScreenState extends State<DashboardScreen> {
         message: "Something went wrong",
         success: false,
       );
+    } finally {
+      // 🔥 Hide please wait text after API finishes
+      setState(() => isDownloading = false);
+    }
+  }
+
+  Future<Map<String, dynamic>?> getProfileDetails(
+    String? employeeId,
+    String? policyNo,
+  ) async {
+    final token = controllers.authToken.toString();
+    if (token == null || token.toString().trim().isEmpty) {
+      print("Token missing → Redirecting to Login");
+
+      controllers.authUser.clear();
+
+      Get.offAll(() => LoginSelection());
+    }
+    const url = "$baseUrl/api/BCGModule/GetAllProfileEmployeeDetails";
+    try {
+      if (employeeId == null || employeeId.isEmpty) {
+        print(" ERROR: EmployeeID is NULL or EMPTY");
+        CustomToast.show(
+          context: context,
+          message: "Employee ID is missing",
+          success: false,
+        );
+        return null;
+      }
+      if (policyNo == null || policyNo.isEmpty) {
+        print(" ERROR: Policy Number is NULL or EMPTY");
+        CustomToast.show(
+          context: context,
+          message: "Policy number is missing",
+          success: false,
+        );
+        return null;
+      }
+
+      final body = {
+        "Action": "GetAllMyProfileDetail",
+        "EmployeeID": employeeId,
+        "PolicyNo": policyNo,
+      };
+
+      print("📤 API REQUEST → GetAllProfileEmployeeDetails");
+      print("➡ URL: $url");
+      print("➡ BODY: ${jsonEncode(body)}");
+      final response = await ApiService.postRequest(
+        url: url,
+        body: body,
+        token: token,
+      );
+      print("📥 API RESPONSE:");
+      print(response);
+
+      // -------------------------
+      // 📌 Response Validation
+      // -------------------------
+      if (response == null) {
+        print(" ERROR: API response is NULL");
+        CustomToast.show(
+          context: context,
+          message: "No response from server",
+          success: false,
+        );
+        return null;
+      }
+
+      if (response["IsError"] == true) {
+        print(" SERVER RETURNED ERROR: ${response["ErrorMessage"]}");
+        CustomToast.show(
+          context: context,
+          message: response["ErrorMessage"] ?? "Server error",
+          success: false,
+        );
+        return null;
+      }
+
+      if (response["Result"] == null) {
+        print(" ERROR: Result key is NULL in response");
+        CustomToast.show(
+          context: context,
+          message: "No profile details found",
+          success: false,
+        );
+        return null;
+      }
+      final result = response["Result"];
+      print("➡ Result: $result");
+      if (result is List && result.isNotEmpty) {
+        final Map<String, dynamic> profileData = result[0];
+        print("PROFILE DETAILS EXTRACTED SUCCESSFULLY FROM LIST");
+        print("➡ Profile Data: $profileData");
+        return profileData;
+      } else {
+        print(" ERROR: Result is empty or not a list");
+        CustomToast.show(
+          context: context,
+          message: "No profile data available",
+          success: false,
+        );
+        return null;
+      }
+    } catch (e, stack) {
+      print(" EXCEPTION OCCURRED:");
+      print("➡ ERROR: $e");
+      print("➡ STACKTRACE: $stack");
+
+      CustomToast.show(
+        context: context,
+        message: "Something went wrong",
+        success: false,
+      );
+      return null;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getPolicyDocuments(String policyNo) async {
+    final token = controllers.authToken.toString();
+    if (token == null || token.toString().trim().isEmpty) {
+      print("Token missing → Redirecting to Login");
+
+      controllers.authUser.clear();
+
+      Get.offAll(() => LoginSelection());
+    }
+    const url = "$baseUrl/api/BCGModule/GetAllHRDashboardDetails";
+
+    try {
+      final payload = {
+        "Action": "GetAllPolicyDocumentList",
+        // "PolicyNo": "OG-26-1904-8403-00000022",
+        "PolicyNo": policyNo,
+      };
+      print("Payload is ${payload}");
+      final response = await ApiService.postRequest(
+        url: url,
+        body: payload,
+        token: token,
+      );
+      print("Decoded get docs response is ${response}");
+      if (response != null &&
+          response['Result'] != null &&
+          response['IsError'] == false) {
+        return List<Map<String, dynamic>>.from(response['Result']);
+      }
+
+      print("⚠️ Invalid API response → $response");
+      return [];
+    } catch (e, stack) {
+      print("❌ Error in getPolicyDocuments: $e");
+      print(stack);
+      return [];
+    }
+  }
+
+  void _showPackageDetailsBottomSheet(
+    BuildContext context,
+    String employeeId,
+    String policyNo,
+  ) {
+    // Fetch profile details when bottom sheet opens
+    Future<Map<String, dynamic>?> profileFuture = getProfileDetails(
+      employeeId,
+      policyNo,
+    );
+
+    showModalBottomSheet(
+      useRootNavigator: true,
+      context: context,
+      isScrollControlled: true,
+      barrierColor: Colors.black.withOpacity(0.2),
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return FutureBuilder<Map<String, dynamic>?>(
+          future: profileFuture,
+          builder: (context, snapshot) {
+            // Handle loading state
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return _buildBottomSheetLoading(context);
+            }
+
+            // Handle error state
+            if (snapshot.hasError || snapshot.data == null) {
+              return _buildBottomSheetError(context, employeeId, policyNo);
+            }
+
+            // Success state - display data
+            final profileData = snapshot.data!;
+            return _buildBottomSheetContent(
+              context,
+              employeeId,
+              policyNo,
+              profileData,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // Loading state widget
+  Widget _buildBottomSheetLoading(BuildContext context) {
+    return Stack(
+      children: [
+        BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+          child: Container(color: Colors.black.withOpacity(0.1)),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: FractionallySizedBox(
+            heightFactor: 0.85,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Error state widget with retry option
+  Widget _buildBottomSheetError(
+    BuildContext context,
+    String employeeId,
+    String policyNo,
+  ) {
+    return Stack(
+      children: [
+        BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+          child: Container(color: Colors.black.withOpacity(0.1)),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: FractionallySizedBox(
+            heightFactor: 0.85,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, color: Colors.red, size: 50),
+                  SizedBox(height: 16),
+                  Text('Failed to load policy details'),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _showPackageDetailsBottomSheet(
+                        context,
+                        employeeId,
+                        policyNo,
+                      );
+                    },
+                    child: Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Main content widget with actual data
+  Widget _buildBottomSheetContent(
+    BuildContext context,
+    String employeeId,
+    String policyNo,
+    Map<String, dynamic> profileData,
+  ) {
+    final insuranceCo = profileData['InsuranceCompany'] ?? 'N/A';
+    final policyName = profileData['PolicyName'] ?? 'N/A';
+    final policyNumber = profileData['PolicyNo'] ?? policyNo;
+    final policyType = profileData['PolicyType'] ?? 'N/A';
+    final policyStart = profileData['PolicyStartDate'] ?? 'N/A';
+    final policyEnd = profileData['PolicyEndDate'] ?? 'N/A';
+    final gender = profileData['Gender'] ?? 'N/A';
+    final sumInsured = profileData['SumInsured'] ?? 'N/A';
+    final healthCardNo = profileData['HealthCardNo'] ?? 'N/A';
+    final dependentCount = profileData['NoOfDependents'] ?? '0';
+    final healthCardPath = profileData['HealthCardPath']?.toString() ?? '';
+
+    return Stack(
+      children: [
+        BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+          child: Container(color: Colors.black.withOpacity(0.1)),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: FractionallySizedBox(
+            heightFactor: 0.85,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 10,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 10),
+                    Center(
+                      child: Container(
+                        height: 5,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          color: Color(0xff004370),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Policy Details', style: AppTextTheme.pageTitle),
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: Icon(Icons.close),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Policy Input',
+                              style: AppTextTheme.pageTitle.copyWith(
+                                fontSize: 14,
+                              ),
+                            ),
+                            SizedBox(height: 10),
+
+                            // Policy Details Rows - Using actual API data
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                detailBlock(
+                                  'Insurance Co',
+                                  insuranceCo,
+                                  context,
+                                ),
+                                detailBlock('Policy Name', policyName, context),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                detailBlock('Policy Type', policyType, context),
+                                detailBlock('Policy No', policyNumber, context),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                detailBlock(
+                                  'Policy Start',
+                                  policyStart,
+                                  context,
+                                ),
+                                detailBlock('Policy End', policyEnd, context),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                detailBlock(
+                                  'Sum Insured',
+                                  '₹ $sumInsured',
+                                  context,
+                                ),
+                                detailBlock(
+                                  'Health Card No.',
+                                  healthCardNo,
+                                  context,
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                detailBlock(
+                                  'No Of Dependent Covered',
+                                  dependentCount != null
+                                      ? dependentCount.toString()
+                                      : '00',
+                                  context,
+                                ),
+                              ],
+                            ),
+
+                            SizedBox(height: 10),
+                            if (dependentDataList.length > 0)
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "My Dependents",
+                                    style: AppTextTheme.subTitle.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      _showDependentBottomSheet(
+                                        context,
+                                        dependentDataList,
+                                      );
+                                    },
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets
+                                          .zero, // removes extra padding
+                                      minimumSize: Size(0, 0),
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "View More",
+                                          style: AppTextTheme.coloredSubTitle
+                                              .copyWith(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 13,
+                                              ),
+                                        ),
+                                        Container(
+                                          height: 2,
+                                          width: 70,
+                                          color: AppTextTheme.primaryColor,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            SizedBox(height: 10),
+                            // Wrap(
+                            //   spacing: 25, // horizontal space between cards
+                            //   // runSpacing: 5, // vertical space between rows
+                            //   children: [
+                            //     familyCard(
+                            //       context: context,
+                            //       iconPath: 'assets/icons/circle-user.svg',
+                            //       title: 'Kumar Sangakara',
+                            //       subtitle: 'DOB: 19-07-1987',
+                            //     ),
+                            //     familyCard(
+                            //       context: context,
+                            //       iconPath: 'assets/icons/circle-user.svg',
+                            //       title: 'Sachin Tendulkar',
+                            //       subtitle: 'DOB: 19-07-1987',
+                            //     ),
+                            //   ],
+                            // ),
+                            Row(
+                              children: [
+                                if (dependentDataList.length > 0)
+                                  Expanded(
+                                    child: familyCard(
+                                      context: context,
+                                      iconPath: 'assets/icons/circle-user.svg',
+                                      title:
+                                          dependentDataList[0]['DependentName'] ??
+                                          'N/A',
+                                      subtitle:
+                                          'DOB: ${dependentDataList[0]['DateOfBirth'] ?? 'N/A'}',
+                                    ),
+                                  ),
+
+                                SizedBox(width: 12),
+
+                                if (dependentDataList.length > 1)
+                                  Expanded(
+                                    child: familyCard(
+                                      context: context,
+                                      iconPath: 'assets/icons/circle-user.svg',
+                                      title:
+                                          dependentDataList[1]['DependentName'] ??
+                                          'N/A',
+                                      subtitle:
+                                          'DOB: ${dependentDataList[1]['DateOfBirth'] ?? ''}',
+                                    ),
+                                  ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            // Download buttons
+                            DottedBorderBtn(
+                              label: "Health Card",
+                              iconPath: 'assets/icons/download_green.svg',
+                              height: 50,
+                              onPressed: () {
+                                downloadHealthCard(context);
+                              },
+                            ),
+
+                            const SizedBox(height: 16),
+                            // DottedBorderBtn(
+                            //   label: "FAQ Documents",
+                            //   iconPath: 'assets/icons/download_green.svg',
+                            //   height: 50,
+                            //   onPressed: () {},
+                            // ),
+                            SizedBox(height: 16),
+
+                            Text(
+                              "Policy Documents",
+                              style: AppTextTheme.subTitle.copyWith(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                            ),
+
+                            SizedBox(height: 10),
+
+                            FutureBuilder(
+                              future: getPolicyDocuments(policyNumber),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting)
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+
+                                if (!snapshot.hasData || snapshot.data!.isEmpty)
+                                  return Text("No documents available");
+
+                                return buildDocumentButtons(snapshot.data!);
+                              },
+                            ),
+
+                            SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Policy Benefits",
+                                  style: AppTextTheme.subTitle.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 5),
+                            PolicyBenefitsCard(policyNo: policyNumber),
+                            SizedBox(height: 30),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildDocumentButtons(List<Map<String, dynamic>> docs) {
+    return Column(
+      children: docs.map((doc) {
+        final name = doc['DocumentName'] ?? 'Document';
+        final path = doc['DocumentPath'] ?? '';
+
+        return Column(
+          children: [
+            DottedBorderBtn(
+              label: name,
+              iconPath: 'assets/icons/download_green.svg',
+              height: 50,
+              onPressed: () {
+                downloadDocument(Get.context!, path);
+              },
+            ),
+            SizedBox(height: 12),
+          ],
+        );
+      }).toList(),
+    );
+  }
+
+  Future<void> downloadDocument(BuildContext context, String filePath) async {
+    final token = controllers.authToken.toString();
+    if (token == null || token.toString().trim().isEmpty) {
+      print("Token missing → Redirecting to Login");
+
+      controllers.authUser.clear();
+
+      Get.offAll(() => LoginSelection());
+      return;
+    }
+    const url = "$baseUrl/api/Account/DownloadDocument";
+
+    try {
+      final overlayContext = Navigator.of(
+        context,
+        rootNavigator: true,
+      ).overlay!.context;
+
+      final payload = {"File": filePath};
+
+      final response = await ApiService.postRequest(
+        url: url,
+        body: payload,
+        token: token,
+      );
+      print("Download document response: $response");
+      if (response == null || response['file'] == null) {
+        CustomToast.show(
+          context: overlayContext,
+          message: "Unable to download file",
+          success: false,
+        );
+        return;
+      }
+
+      final base64File = response['file'];
+      final bytes = base64Decode(base64File);
+
+      final directory = Directory("/storage/emulated/0/Download");
+      final fileName = filePath.split("\\").last;
+      final filePathSave = "${directory.path}/$fileName";
+
+      final file = File(filePathSave);
+      await file.writeAsBytes(bytes);
+
+      CustomToast.show(
+        context: overlayContext,
+        message: "File saved to Downloads/$fileName",
+        success: true,
+      );
+    } catch (e) {
+      print("Download error: $e");
     }
   }
 
@@ -509,12 +1332,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(
-            left: 12,
-            right: 12,
-            top: 10,
-            bottom: 0,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Column(
             children: [
               Row(
@@ -535,10 +1353,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         width: 20,
                       ),
                       SizedBox(width: 10),
-                      SvgPicture.asset(
-                        'assets/icons/download_green.svg',
-                        height: 23,
-                        width: 24,
+                      InkWell(
+                        onTap: () => downloadHealthCard(context),
+                        child: SvgPicture.asset(
+                          'assets/icons/download_green.svg',
+                          height: 23,
+                          width: 24,
+                        ),
                       ),
                     ],
                   ),
@@ -601,7 +1422,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       ),
                                       Text(
                                         _formatSumInsured(
-                                          selfPolicyData?['SumInsured'],
+                                          profileDetailsData?['SumInsured'] ??
+                                              'N/A',
                                         ),
                                         style: AppTextTheme.subTitle.copyWith(
                                           fontSize: 12,
@@ -635,7 +1457,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           style: AppTextTheme.paragraph,
                                         ),
                                         Text(
-                                          "Health Accident", // You can make this dynamic
+                                          selfPolicyData?['CategoryValue'],
+
                                           style: AppTextTheme.subTitle.copyWith(
                                             fontSize: 12,
                                           ),
@@ -698,34 +1521,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         fontSize: 16,
                       ),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        _showDependentBottomSheet(context, dependentDataList);
-                      },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero, // removes extra padding
-                        minimumSize: Size(0, 0),
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            "View More",
-                            style: AppTextTheme.coloredSubTitle.copyWith(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
+                    if (dependentDataList.length > 1)
+                      TextButton(
+                        onPressed: () {
+                          _showDependentBottomSheet(context, dependentDataList);
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero, // removes extra padding
+                          minimumSize: Size(0, 0),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              "View More",
+                              style: AppTextTheme.coloredSubTitle.copyWith(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                              ),
                             ),
-                          ),
-                          Container(
-                            height: 2,
-                            width: 70,
-                            color: AppTextTheme.primaryColor,
-                          ),
-                        ],
+                            Container(
+                              height: 2,
+                              width: 70,
+                              color: AppTextTheme.primaryColor,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
                   ],
                 ),
               SizedBox(height: 10),
@@ -788,10 +1612,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   TextButton(
                     onPressed: () {
-                      Get.to(() => MyPolicyScreen());
+                      String policyNo = selfPolicyData?['PolicyNo'];
+                      String employeeId = controllers.authUser['employeeId']
+                          .toString();
+
+                      _showPackageDetailsBottomSheet(
+                        context,
+                        employeeId,
+                        policyNo,
+                      );
+
+                      // Get the policy number from selfPolicyData
+                      // final String policyNo =
+                      //     selfPolicyData?['PolicyNo']?.toString() ?? '';
+
+                      // if (policyNo.isEmpty) {
+                      //   CustomToast.show(
+                      //     context: context,
+                      //     message: "Policy number not available",
+                      //     success: false,
+                      //   );
+                      //   return;
+                      // }
+
+                      // // Navigate to MyPolicyScreen and auto-open details
+                      // Get.to(
+                      //   () => MyPolicyScreen(
+                      //     initialPolicyNo:
+                      //         policyNo, // ← This triggers auto-open
+                      //   ),
+                      // );
                     },
                     style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero, // removes extra padding
+                      padding: EdgeInsets.zero,
                       minimumSize: Size(0, 0),
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
@@ -812,7 +1665,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
               ),
               SizedBox(height: 5),
-              PolicyBenefitsCard(),
+              if (selfPolicyData?['PolicyNo'] != null)
+                PolicyBenefitsCard(policyNo: selfPolicyData!['PolicyNo'] ?? ''),
 
               SizedBox(height: 20),
               Row(
@@ -877,7 +1731,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   );
                 },
               ),
-
+              SizedBox(height: context.height * 0.02),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -960,10 +1814,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     ),
                                   ),
                                 ),
-
                                 const SizedBox(height: 8),
-
-                                // Bottom text
                                 Text(
                                   carouselIcons[index]['label'],
                                   textAlign: TextAlign.center,
@@ -1031,7 +1882,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   crossAxisCount: 3,
                   mainAxisSpacing: 8,
                   crossAxisSpacing: 12,
-                  childAspectRatio: 2.5,
+                  childAspectRatio: 2.3,
                 ),
                 itemCount: nameList.length,
                 itemBuilder: (context, index) {
@@ -1042,60 +1893,66 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       border: Border.all(color: AppTextTheme.primaryColor),
                     ),
                     child: Center(
-                      child: Text(
-                        nameList[index]['label']!,
-                        textAlign: TextAlign.center,
-                        style: AppTextTheme.subTitle.copyWith(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 13,
-                          color: const Color(0xFF00635F),
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Text(
+                          nameList[index]['label']!,
+                          textAlign: TextAlign.center,
+                          style: AppTextTheme.subTitle.copyWith(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                            color: const Color(0xFF00635F),
+                          ),
                         ),
                       ),
                     ),
                   );
                 },
               ),
-              SizedBox(height: 20),
-              Container(
-                width: 220,
-                height: 220,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF00635F),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppTextTheme.primaryColor),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTextTheme.primaryColor,
-                      offset: const Offset(10, 8),
-                    ),
-                  ],
-                ),
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: SvgPicture.asset(
-                    "assets/icons/asset_1.svg",
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
+              SizedBox(height: 30),
 
-              Text(
-                "Buy Travel Insurance",
-                style: AppTextTheme.pageTitle.copyWith(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Text(
-                "Protect your trip with travel insurance!",
-                style: AppTextTheme.subItemTitle.copyWith(
-                  color: Colors.grey.shade600,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              SizedBox(height: 20),
-              Buttons(onPressed: () {}, ddName: "Coming Soon", width: 150),
+              FeatureCarousel(),
+
+              // Container(
+              //   width: 220,
+              //   height: 220,
+              //   decoration: BoxDecoration(
+              //     color: const Color(0xFF00635F),
+              //     borderRadius: BorderRadius.circular(12),
+              //     border: Border.all(color: AppTextTheme.primaryColor),
+              //     boxShadow: [
+              //       BoxShadow(
+              //         color: AppTextTheme.primaryColor,
+              //         offset: const Offset(10, 8),
+              //       ),
+              //     ],
+              //   ),
+              //   child: Align(
+              //     alignment: Alignment.bottomCenter,
+              //     child: SvgPicture.asset(
+              //       "assets/icons/asset_1.svg",
+              //       fit: BoxFit.contain,
+              //     ),
+              //   ),
+              // ),
+              // SizedBox(height: 20),
+
+              // Text(
+              //   "Buy Travel Insurance",
+              //   style: AppTextTheme.pageTitle.copyWith(
+              //     fontSize: 20,
+              //     fontWeight: FontWeight.w600,
+              //   ),
+              // ),
+              // Text(
+              //   "Protect your trip with travel insurance!",
+              //   style: AppTextTheme.subItemTitle.copyWith(
+              //     color: Colors.grey.shade600,
+              //     fontWeight: FontWeight.w400,
+              //   ),
+              // ),
+              // SizedBox(height: 20),
+              // Buttons(onPressed: () {}, ddName: "Coming Soon", width: 150),
               SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -1115,10 +1972,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Buttons(
-                      onPressed: () {
-                        downloadManual(context);
-                      },
-                      ddName: "Download user manual",
+                      onPressed: isDownloading
+                          ? null // disable button while downloading
+                          : () {
+                              downloadManual(context);
+                            },
+                      ddName: isDownloading
+                          ? "Please wait..."
+                          : "Download user manual",
                       width: 150,
                     ),
                   ],

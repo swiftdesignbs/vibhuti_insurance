@@ -3,7 +3,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 
 class FamilyCardTwo extends StatelessWidget {
-  final String iconPath;
   final String name;
   final String dob;
   final String dependent;
@@ -11,7 +10,6 @@ class FamilyCardTwo extends StatelessWidget {
 
   const FamilyCardTwo({
     Key? key,
-    required this.iconPath,
     required this.name,
     required this.dob,
     required this.dependent,
@@ -41,7 +39,11 @@ class FamilyCardTwo extends StatelessWidget {
           CircleAvatar(
             radius: 20,
             backgroundColor: AppTextTheme.primaryColor,
-            child: SvgPicture.asset(iconPath, height: 28, width: 28),
+            child: SvgPicture.asset(
+              "assets/icons/circle-user.svg",
+              height: 28,
+              width: 28,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(

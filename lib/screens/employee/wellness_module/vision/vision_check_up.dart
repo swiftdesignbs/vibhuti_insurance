@@ -195,12 +195,12 @@ class _VisionCheckUpScreenState extends State<VisionCheckUpScreen> {
         showWelcomeText: false,
       ),
       backgroundColor: Colors.white,
-      body: CustomScrollView(
-        slivers: [
-          // --- Main content (scrollable) ---
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+        child: CustomScrollView(
+          slivers: [
+            // --- Main content (scrollable) ---
+            SliverToBoxAdapter(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -342,33 +342,34 @@ class _VisionCheckUpScreenState extends State<VisionCheckUpScreen> {
                     ),
                   const SizedBox(height: 10),
                   Text('Diagnosis Centre List', style: AppTextTheme.subTitle),
+                  const SizedBox(height: 10),
                 ],
               ),
             ),
-          ),
 
-          // --- Sticky Search Bar ---
-          SliverPersistentHeader(
-            pinned: true,
-            floating: false,
-            delegate: _StickySearchBarDelegate(
-              child: Container(
-                // color: Theme.of(context).scaffoldBackgroundColor,
-                color: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                child: CustomTextField(
-                  controller: searchController,
-                  hintText: "Search Hospital Name",
-                  suffixIcon: "assets/icons/search_color.svg",
+            // --- Sticky Search Bar ---
+            SliverPersistentHeader(
+              pinned: true,
+              floating: false,
+              delegate: _StickySearchBarDelegate(
+                child: Container(
+                  // color: Theme.of(context).scaffoldBackgroundColor,
+                  color: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                  //  horizontal: 8,
+                    vertical: 2,
+                  ),
+                  child: CustomTextField(
+                    controller: searchController,
+                    hintText: "Search Hospital Name",
+                    suffixIcon: "assets/icons/search_color.svg",
+                  ),
                 ),
               ),
             ),
-          ),
 
-          // --- Gender Filters + Hospital List ---
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+            // --- Gender Filters + Hospital List ---
+            SliverToBoxAdapter(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -379,7 +380,7 @@ class _VisionCheckUpScreenState extends State<VisionCheckUpScreen> {
                       SizedBox(width: 18),
                       genderOption('Male'),
                       SizedBox(width: 18),
-
+              
                       genderOption('Female'),
                     ],
                   ),
@@ -392,20 +393,17 @@ class _VisionCheckUpScreenState extends State<VisionCheckUpScreen> {
                 ],
               ),
             ),
-          ),
 
-          // --- Hospital List Scrollable ---
-          SliverList(
-            delegate: SliverChildBuilderDelegate((context, index) {
-              final hospital = _allHospitals[index];
-              return Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Container(
+            // --- Hospital List Scrollable ---
+            SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final hospital = _allHospitals[index];
+                return Container(
                   margin: const EdgeInsets.symmetric(
-                    horizontal: 8,
+                   // horizontal: 8,
                     vertical: 4,
                   ),
-
+                
                   // decoration: BoxDecoration(
                   //   borderRadius: BorderRadius.circular(20),
                   //   border: Border.all(color: AppTextTheme.primaryColor),
@@ -445,7 +443,7 @@ class _VisionCheckUpScreenState extends State<VisionCheckUpScreen> {
                                 ),
                               ],
                             ),
-
+                
                             Text(
                               hospital['address'],
                               style: AppTextTheme.paragraph,
@@ -484,11 +482,11 @@ class _VisionCheckUpScreenState extends State<VisionCheckUpScreen> {
                       ),
                     ],
                   ),
-                ),
-              );
-            }, childCount: _allHospitals.length),
-          ),
-        ],
+                );
+              }, childCount: _allHospitals.length),
+            ),
+          ],
+        ),
       ),
     );
   }

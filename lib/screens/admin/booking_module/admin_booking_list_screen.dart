@@ -96,7 +96,6 @@ class _AdminBookingListScreenState extends State<AdminBookingListScreen> {
           children: [
             const Text("Company Name", style: AppTextTheme.subItemTitle),
             const SizedBox(height: 10),
-
             GestureDetector(
               onTap: () {
                 setState(() {

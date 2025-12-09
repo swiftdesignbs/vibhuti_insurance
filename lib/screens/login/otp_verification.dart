@@ -180,7 +180,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
     const completeURL = "$baseUrl$url";
 
     final Map<String, dynamic> body = {
-      "EmployeeId": 109332,
+      "EmployeeId": controller.authUser["employeeId"] ?? 0,
       "Password": null,
       "UserName": null,
       "MobileNo": widget.mobileNo,

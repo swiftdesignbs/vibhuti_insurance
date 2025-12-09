@@ -6,8 +6,11 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/employee/dashboard/dashboard_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/login/login_selection.dart';
 import 'package:vibhuti_insurance_mobile_app/state_management/state_management.dart';
+import 'package:vibhuti_insurance_mobile_app/utils/api_service.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
+import 'package:vibhuti_insurance_mobile_app/utils/constant.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/base_scaffold.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/employee/my_policy/my_policy_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/employee/wellness_module/health/health_check_up.dart';
@@ -35,23 +38,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   TextEditingController emailId = TextEditingController();
   TextEditingController mobileNo = TextEditingController();
   final controllers = Get.put(StateController());
-
-  final List<Map<String, String>> familyMembers = [
-    {
-      'name': 'Jane Doe',
-      'dob': '21-05-1990',
-      'icon': 'assets/icons/circle-user.svg',
-      'dependent': 'Spouse',
-      'doc': '30-09-2024',
-    },
-    {
-      'name': 'Chris Evans',
-      'dob': '09-08-1985',
-      'icon': 'assets/icons/circle-user.svg',
-      'dependent': 'Father',
-      'doc': '30-09-2024',
-    },
-  ];
 
   Future<String?> _showCalenderBottomSheet(
     BuildContext context,
@@ -720,6 +706,70 @@ class _ProfileScreenState extends State<ProfileScreen> {
     print(
       "controllers user date :  ${controllers.authUserProfileData.toString()}",
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadDependentData();
+    });
+  }
+
+  //{"Action":"GetDependentInformation","EmployeeID":"108627"}
+
+  List dependentDataList = [];
+  Future<List?> getDependentData() async {
+    final token = controllers.authToken.toString();
+    if (token == null || token.toString().trim().isEmpty) {
+      print("Token missing getDependentData → Redirecting to Login");
+      controllers.authUser.clear();
+      Get.offAll(() => LoginSelection());
+      return null;
+    }
+    const url = "$baseUrl/api/BCGModule/GetAllProfileEmployeeDetails";
+    final body = {
+      "EmployeeID": controllers.authUser['employeeId'].toString(),
+      //   "EmployeeID": 109015,
+      "Action": "GetAllEmpProfileDataFOrHealthCard",
+      //  "CompanyId": 204,
+      "CompanyId": controllers.authUserProfileData['companyId'].toString(),
+    };
+    try {
+      final response = await ApiService.postRequest(
+        url: url,
+        body: body,
+        token: token,
+      );
+      print("response : $response");
+      if (response == null) return null;
+      if (response["IsError"] == true) return null;
+      return response["Result"] as List?; // <-- IMPORTANT
+    } catch (e) {
+      print("Error: $e");
+      return null;
+    }
+  }
+
+  bool isLoading = false;
+  List<String> stateList = [];
+  String selectedState = "";
+  List<Map<String, String>> familyMembers = [];
+
+  Future<void> loadDependentData() async {
+    setState(() => isLoading = true);
+
+    final data = await getDependentData();
+    print("data : $data");
+    if (data != null) {
+      familyMembers = data.map<Map<String, String>>((item) {
+        return {
+          "name": item["DependentName"]?.toString() ?? "NA",
+          "dob": item["DateOfBirth"]?.toString() ?? "NA",
+          "dependent": item["CategoryValue"]?.toString() ?? "NA", // STATIC
+          "doc": item["DateOfJoining"]?.toString() ?? "NA", // STATIC
+        };
+      }).toList();
+    } else {
+      familyMembers = [];
+    }
+
+    setState(() => isLoading = false);
   }
 
   @override
@@ -733,7 +783,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -757,33 +807,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
               SizedBox(height: 10),
               employeeInfoCard(context, controllers),
 
-              // SizedBox(height: 10),
-              // ListView.builder(
-              //   shrinkWrap: true,
-              //   physics: const NeverScrollableScrollPhysics(),
-              //   itemCount: familyMembers.length,
-              //   itemBuilder: (context, index) {
-              //     final member = familyMembers[index];
-              //     return FamilyCardTwo(
-              //       iconPath: member['icon']!,
-              //       name: member['name']!,
-              //       dob: member['dob']!,
-              //       dependent: member['dependent']!,
-              //       doc: member['doc']!,
-              //     );
-              //   },
-              // ),
-              SizedBox(height: 40),
-
-              Center(
-                child: Text(
-                  "NO DEPENDENT`S ADDED YET",
-                  style: AppTextTheme.subTitle.copyWith(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
+              SizedBox(height: 10),
+              isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : familyMembers.isEmpty
+                  ? Center(
+                      child: Text(
+                        "No dependents found",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: familyMembers.length,
+                      itemBuilder: (context, index) {
+                        final member = familyMembers[index];
+                        return FamilyCardTwo(
+                          name: member['name']!,
+                          dob: member['dob']!,
+                          dependent: member['dependent']!, // STATIC NA
+                          doc: member['doc']!, // STATIC NA
+                        );
+                      },
+                    ),
             ],
           ),
         ),
@@ -808,10 +858,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 Widget employeeInfoCard(BuildContext context, StateController controllers) {
   final screenWidth = MediaQuery.of(context).size.width;
   final isSmallScreen = screenWidth < 360;
-
   // Extract data from the controller
   final profile = controllers.authUserProfileData;
-
   final items = [
     {"title": "Company Name", "description": profile["companyName"] ?? ""},
     {"title": "Employee Code", "description": profile["employeeCode"] ?? ""},
@@ -820,7 +868,6 @@ Widget employeeInfoCard(BuildContext context, StateController controllers) {
     {"title": "Email ID", "description": profile["emailAddress"] ?? ""},
     {"title": "Mobile No.", "description": profile["mobileNo"] ?? ""},
   ];
-
   return Container(
     decoration: BoxDecoration(
       color: Colors.white,
@@ -850,7 +897,6 @@ Widget employeeInfoCard(BuildContext context, StateController controllers) {
             ),
           ),
         ),
-
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: LayoutBuilder(

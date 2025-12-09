@@ -26,6 +26,7 @@ class BookingScreen extends StatefulWidget {
   @override
   State<BookingScreen> createState() => _BookingScreenState();
 }
+
 class _BookingScreenState extends State<BookingScreen> {
   TextEditingController searchController = TextEditingController();
   TextEditingController appointmentDate1Controller = TextEditingController();
@@ -110,7 +111,8 @@ class _BookingScreenState extends State<BookingScreen> {
     BuildContext context,
     TextEditingController textEditingController,
   ) async {
-    return showModalBottomSheet(useRootNavigator: true,
+    return showModalBottomSheet(
+      useRootNavigator: true,
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -222,7 +224,8 @@ class _BookingScreenState extends State<BookingScreen> {
     BuildContext context,
     Map<String, dynamic> package,
   ) {
-    showModalBottomSheet(useRootNavigator: true,
+    showModalBottomSheet(
+      useRootNavigator: true,
       context: context,
       isScrollControlled: true,
       barrierColor: Colors.black.withOpacity(0.2), // Optional dimming
@@ -420,7 +423,8 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   void _showSuccessBottomSheet(BuildContext context) {
-    showModalBottomSheet(useRootNavigator: true,
+    showModalBottomSheet(
+      useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       context: context,
@@ -492,7 +496,8 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   void _showCancelBottomSheet(BuildContext context) {
-    showModalBottomSheet(useRootNavigator: true,
+    showModalBottomSheet(
+      useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       context: context,
@@ -609,7 +614,8 @@ class _BookingScreenState extends State<BookingScreen> {
     BuildContext context,
     Map<String, dynamic> package,
   ) {
-    showModalBottomSheet(useRootNavigator: true,
+    showModalBottomSheet(
+      useRootNavigator: true,
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -817,34 +823,14 @@ class _BookingScreenState extends State<BookingScreen> {
                 itemBuilder: (context, index) {
                   final package = insurancePackages[index];
                   return Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 8, 12),
+                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 12),
                     child: Container(
                       height: 150,
-
-                      decoration: index == 0
-                          ? BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: AppTextTheme.primaryColor,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color(
-                                    0XFF00635F,
-                                  ), // darker teal shadow
-                                  offset: const Offset(6, 6), // shadow position
-                                  blurRadius: 0,
-                                ),
-                              ],
-                            )
-                          : BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: AppTextTheme.primaryColor,
-                              ),
-                            ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AppTextTheme.primaryColor),
+                      ),
                       child: Column(
                         children: [
                           Padding(
