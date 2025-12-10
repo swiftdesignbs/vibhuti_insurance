@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:vibhuti_insurance_mobile_app/alerts/toast.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/employee/employee_booking_module/booking_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/employee/my_policy/my_policy_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/employee/profile/profile_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/employee/wellness_module/dental/dental_checkup.dart';
@@ -30,10 +31,16 @@ import 'package:vibhuti_insurance_mobile_app/widgets/quick_links.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/regular_btn.dart';
 
 class DashboardScreen extends StatefulWidget {
+  final PersistentTabController controller;
   final GlobalKey<ScaffoldState>? scaffoldKey;
   final Function(BuildContext) onReady;
 
-  const DashboardScreen({super.key, this.scaffoldKey, required this.onReady});
+  const DashboardScreen({
+    super.key,
+    required this.controller,
+    this.scaffoldKey,
+    required this.onReady,
+  });
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -43,7 +50,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final PageController carouselController = PageController();
   int _currentIndex = 0;
   final controllers = Get.put(StateController());
-
   Future<String> getDownloadFolderPath() async {
     final dir =
         await getExternalStorageDirectory(); // /storage/emulated/0/Android/data/<package>/files
@@ -1610,6 +1616,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       fontSize: 16,
                     ),
                   ),
+
                   TextButton(
                     onPressed: () {
                       String policyNo = selfPolicyData?['PolicyNo'];
@@ -1621,30 +1628,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         employeeId,
                         policyNo,
                       );
-
-                      // Get the policy number from selfPolicyData
-                      // final String policyNo =
-                      //     selfPolicyData?['PolicyNo']?.toString() ?? '';
-
-                      // if (policyNo.isEmpty) {
-                      //   CustomToast.show(
-                      //     context: context,
-                      //     message: "Policy number not available",
-                      //     success: false,
-                      //   );
-                      //   return;
-                      // }
-
-                      // // Navigate to MyPolicyScreen and auto-open details
-                      // Get.to(
-                      //   () => MyPolicyScreen(
-                      //     initialPolicyNo:
-                      //         policyNo, // ← This triggers auto-open
-                      //   ),
-                      // );
                     },
                     style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
+                      padding: EdgeInsets.zero, // removes extra padding
                       minimumSize: Size(0, 0),
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
@@ -1655,13 +1641,70 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Text(
                           "View Details",
                           style: AppTextTheme.coloredSubTitle.copyWith(
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w600,
                             fontSize: 13,
                           ),
+                        ),
+                        Container(
+                          height: 2,
+                          width: 70,
+                          color: AppTextTheme.primaryColor,
                         ),
                       ],
                     ),
                   ),
+                  // TextButton(
+                  //   onPressed: () {
+                  //     String policyNo = selfPolicyData?['PolicyNo'];
+                  //     String employeeId = controllers.authUser['employeeId']
+                  //         .toString();
+
+                  //     _showPackageDetailsBottomSheet(
+                  //       context,
+                  //       employeeId,
+                  //       policyNo,
+                  //     );
+
+                  //     // Get the policy number from selfPolicyData
+                  //     // final String policyNo =
+                  //     //     selfPolicyData?['PolicyNo']?.toString() ?? '';
+
+                  //     // if (policyNo.isEmpty) {
+                  //     //   CustomToast.show(
+                  //     //     context: context,
+                  //     //     message: "Policy number not available",
+                  //     //     success: false,
+                  //     //   );
+                  //     //   return;
+                  //     // }
+
+                  //     // // Navigate to MyPolicyScreen and auto-open details
+                  //     // Get.to(
+                  //     //   () => MyPolicyScreen(
+                  //     //     initialPolicyNo:
+                  //     //         policyNo, // ← This triggers auto-open
+                  //     //   ),
+                  //     // );
+                  //   },
+                  //   style: TextButton.styleFrom(
+                  //     padding: EdgeInsets.zero,
+                  //     minimumSize: Size(0, 0),
+                  //     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  //   ),
+                  //   child: Column(
+                  //     mainAxisSize: MainAxisSize.min,
+                  //     mainAxisAlignment: MainAxisAlignment.start,
+                  //     children: [
+                  //       Text(
+                  //         "View Details",
+                  //         style: AppTextTheme.coloredSubTitle.copyWith(
+                  //           fontWeight: FontWeight.w500,
+                  //           fontSize: 13,
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
                 ],
               ),
               SizedBox(height: 5),
@@ -1696,7 +1739,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 itemBuilder: (context, index) {
                   return InkWell(
                     onTap: () {
-                      // TODO: Add navigation here based on index
+                      if (index == 0) {
+                        if (widget.controller != null) {
+                          widget.controller!.jumpToTab(1);
+                        }
+                      }
                       print("Clicked: ${titles[index]}");
                     },
                     child: Container(
@@ -1742,21 +1789,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       fontSize: 16,
                     ),
                   ),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Color(0xFFBDECEB),
+                  InkWell(
+                    onTap: () {
+                      PersistentNavBarNavigator.pushNewScreen(
+                        context,
+                        screen: BookingScreen(
+                          scaffoldKey: GlobalKey<ScaffoldState>(),
+                        ),
+                        withNavBar: true,
+                        pageTransitionAnimation:
+                            PageTransitionAnimation.cupertino,
+                      );
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Color(0xFFBDECEB),
 
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(color: AppTextTheme.primaryColor),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Text(
-                        "Booking List",
-                        style: AppTextTheme.subTitle.copyWith(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 12,
-                          color: const Color(0xFF00635F),
+                        borderRadius: BorderRadius.circular(25),
+                        border: Border.all(color: AppTextTheme.primaryColor),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Text(
+                          "Booking List",
+                          style: AppTextTheme.subTitle.copyWith(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12,
+                            color: const Color(0xFF00635F),
+                          ),
                         ),
                       ),
                     ),

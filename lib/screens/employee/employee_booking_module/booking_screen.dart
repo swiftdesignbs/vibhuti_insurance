@@ -20,9 +20,9 @@ import 'package:vibhuti_insurance_mobile_app/widgets/regular_btn.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/shadow_btn.dart';
 
 class BookingScreen extends StatefulWidget {
-  final GlobalKey<ScaffoldState>? scaffoldKey;
+    final GlobalKey<ScaffoldState> scaffoldKey;
 
-  const BookingScreen({super.key, this.scaffoldKey});
+  const BookingScreen({super.key,required this.scaffoldKey});
   @override
   State<BookingScreen> createState() => _BookingScreenState();
 }
@@ -765,6 +765,11 @@ class _BookingScreenState extends State<BookingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: widget.scaffoldKey,
+      drawer: AppDrawer(
+        scaffoldKey: widget.scaffoldKey,
+        parentContext: context,
+      ),
       appBar: AppBarUtils.buildCommonAppBar(
         context: context,
         screenTitle: "Booking List",

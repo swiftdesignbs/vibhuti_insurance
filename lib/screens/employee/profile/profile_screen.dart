@@ -838,21 +838,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ),
-
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 60),
-        child: Buttons(
-          onPressed: () {
-            _showAddDependentBottomSheet(context);
-          },
-          ddName: "Add Dependent",
-
-          width: double.infinity,
-          iconPath: "assets/icons/add_dependent.svg",
-        ),
-      ),
     );
   }
+}
+
+String _formatName(dynamic name) {
+  if (name == null) return "";
+
+  String text = name.toString().trim().toLowerCase();
+
+  return text
+      .split(" ")
+      .map(
+        (word) => word.isEmpty ? "" : word[0].toUpperCase() + word.substring(1),
+      )
+      .join(" ");
 }
 
 Widget employeeInfoCard(BuildContext context, StateController controllers) {
@@ -891,7 +891,7 @@ Widget employeeInfoCard(BuildContext context, StateController controllers) {
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           alignment: Alignment.centerLeft,
           child: Text(
-            profile["employeeName"] ?? "",
+            _formatName(profile["employeeName"]),
             style: AppTextTheme.buttonText.copyWith(
               fontSize: isSmallScreen ? 14 : 16,
             ),
@@ -955,7 +955,7 @@ class FeatureItem2 extends StatelessWidget {
           Text(
             description,
             softWrap: true,
-            maxLines: null,
+            maxLines: 2,
             style: AppTextTheme.subTitle.copyWith(
               color: const Color(0xFF004370),
               fontWeight: FontWeight.w600,

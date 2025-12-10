@@ -34,6 +34,7 @@ class _MainScreenState extends State<MainScreen> {
   List<Widget> _buildScreens() {
     return [
       DashboardScreen(
+        controller: _controller,
         scaffoldKey: _scaffoldKey,
         onReady: (ctx) {
           setState(() {

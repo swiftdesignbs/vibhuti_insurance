@@ -1,3 +1,6 @@
+// whichever tab is not present in persistentnavbar will show index 0 of navbar i.e. home icon selected so did this.
+//because context of Dashboard screen is passed from main screen so index 0 is used.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -170,6 +173,8 @@ class _AppDrawerState extends State<AppDrawer> {
                     onTap: () {
                       widget.scaffoldKey.currentState?.closeDrawer();
 
+                      // whichever tab is not present in persistentnavbar will show index 0 of navbar i.e. home icon selected so did this.
+                      //because context of Dashboard screen is passed from main screen so index 0 is used.
                       _navigateToTab(0);
 
                       Future.delayed(const Duration(milliseconds: 250), () {
