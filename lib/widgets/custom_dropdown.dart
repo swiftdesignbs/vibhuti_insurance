@@ -44,6 +44,7 @@ class _CustomDropdownOverlayState extends State<CustomDropdownOverlay> {
   }
 
   void openDropdown() {
+    closeDropdown();
     final overlay = Overlay.of(context);
 
     _overlayEntry = OverlayEntry(
@@ -104,6 +105,15 @@ class _CustomDropdownOverlayState extends State<CustomDropdownOverlay> {
     _overlayEntry?.remove();
     _overlayEntry = null;
     setState(() => isOpen = false);
+  }
+
+  @override
+  void didUpdateWidget(covariant CustomDropdownOverlay oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.selectedValue != widget.selectedValue) {
+      controller.text = widget.selectedValue ?? "";
+    }
   }
 
   @override

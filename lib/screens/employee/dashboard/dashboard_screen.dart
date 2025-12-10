@@ -1,27 +1,24 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
-import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:open_file/open_file.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:vibhuti_insurance_mobile_app/alerts/toast.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/employee/my_policy/my_policy_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/employee/profile/profile_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/employee/wellness_module/dental/dental_checkup.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/employee/wellness_module/health/health_check_up.dart';
-import 'package:vibhuti_insurance_mobile_app/screens/employee/profile/profile_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/employee/wellness_module/home_sample.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/employee/wellness_module/opd_benefits.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/employee/wellness_module/vision/vision_check_up.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/login/login_selection.dart';
 import 'package:vibhuti_insurance_mobile_app/state_management/state_management.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/api_service.dart';
-
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/constant.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/app_bar.dart';
@@ -34,8 +31,9 @@ import 'package:vibhuti_insurance_mobile_app/widgets/regular_btn.dart';
 
 class DashboardScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState>? scaffoldKey;
+  final Function(BuildContext) onReady;
 
-  const DashboardScreen({super.key, this.scaffoldKey});
+  const DashboardScreen({super.key, this.scaffoldKey, required this.onReady});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -417,7 +415,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         );
         return;
       }
-
 
       final manualPath = res1["Result"][0]["HealthCardPath"] ?? "";
 
@@ -1287,6 +1284,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) widget.onReady(context);
+    });
+
     return Scaffold(
       appBar: AppBarUtils.buildCommonAppBar(
         context: context,
@@ -1458,7 +1459,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         ),
                                         Text(
                                           selfPolicyData?['CategoryValue'],
-
                                           style: AppTextTheme.subTitle.copyWith(
                                             fontSize: 12,
                                           ),

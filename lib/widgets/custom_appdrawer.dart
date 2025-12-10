@@ -16,12 +16,13 @@ class AppDrawer extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
   final PersistentTabController? controller;
   final BuildContext parentContext; // 👈 Add this
-
+  final List<BuildContext?>? tabContexts;
   const AppDrawer({
     super.key,
     required this.scaffoldKey,
     this.controller,
-    required this.parentContext, // 👈 Required
+    required this.parentContext,
+    this.tabContexts, // 👈 Required
   });
 
   @override
@@ -138,19 +139,38 @@ class _AppDrawerState extends State<AppDrawer> {
                   drawerMenuItem(
                     title: 'Dashboard',
                     iconPath: 'assets/icons/dashboard.svg',
-                    onTap: () => _navigateToTab(0),
+                    onTap: () {
+                      widget.scaffoldKey.currentState?.closeDrawer();
+
+                      PersistentNavBarNavigator.popUntilFirstScreenOnSelectedTabScreen(
+                        widget.parentContext,
+                      );
+
+                      _navigateToTab(0);
+                    },
+
                     iconColor: Color(0XFF004370),
                   ),
                   drawerMenuItem(
                     title: 'My Policy',
                     iconPath: 'assets/icons/policy.svg',
-                    onTap: () => _navigateToTab(1),
+                    onTap: () {
+                      widget.scaffoldKey.currentState?.closeDrawer();
+
+                      PersistentNavBarNavigator.popUntilFirstScreenOnSelectedTabScreen(
+                        widget.parentContext,
+                      );
+
+                      _navigateToTab(1);
+                    },
                   ),
                   drawerMenuItem(
                     title: 'Wellness Services',
                     iconPath: 'assets/icons/wellness.svg',
                     onTap: () {
                       widget.scaffoldKey.currentState?.closeDrawer();
+
+                      _navigateToTab(0);
 
                       Future.delayed(const Duration(milliseconds: 250), () {
                         PersistentNavBarNavigator.pushNewScreen(
@@ -171,6 +191,7 @@ class _AppDrawerState extends State<AppDrawer> {
                     onTap: () {
                       widget.scaffoldKey.currentState?.closeDrawer();
 
+                      _navigateToTab(0);
                       Future.delayed(const Duration(milliseconds: 250), () {
                         PersistentNavBarNavigator.pushNewScreen(
                           widget.parentContext,
@@ -192,6 +213,7 @@ class _AppDrawerState extends State<AppDrawer> {
                     onTap: () {
                       widget.scaffoldKey.currentState?.closeDrawer();
 
+                      _navigateToTab(0);
                       Future.delayed(const Duration(milliseconds: 250), () {
                         PersistentNavBarNavigator.pushNewScreen(
                           widget.parentContext, // 👈 use main screen context
@@ -210,6 +232,12 @@ class _AppDrawerState extends State<AppDrawer> {
                     title: 'Claim History',
                     iconPath: 'assets/icons/tpa_claim.svg',
                     onTap: () {
+                      widget.scaffoldKey.currentState?.closeDrawer();
+
+                      PersistentNavBarNavigator.popUntilFirstScreenOnSelectedTabScreen(
+                        widget.parentContext,
+                      );
+
                       _navigateToTab(3);
                     },
                   ),

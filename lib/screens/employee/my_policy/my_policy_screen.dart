@@ -527,15 +527,7 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
                             ),
 
                             const SizedBox(height: 20),
-  Text(
-                              "Policy Documents",
-                              style: AppTextTheme.subTitle.copyWith(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                            ),
 
-                            SizedBox(height: 10),
                             // Download buttons
                             DottedBorderBtn(
                               label: isDownloadingDoc
@@ -557,7 +549,7 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
                             //   height: 50,
                             //   onPressed: () {},
                             // ),
-
+                            SizedBox(height: 16),
 
                           
 
@@ -569,6 +561,9 @@ class _MyPolicyScreenState extends State<MyPolicyScreen> {
                                   return Center(
                                     child: CircularProgressIndicator(),
                                   );
+
+                                if (!snapshot.hasData || snapshot.data!.isEmpty)
+                                  return Text("No documents available");
 
                                 return buildDocumentButtons(snapshot.data!);
                               },

@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
-
-import 'package:vibhuti_insurance_mobile_app/screens/employee/employee_booking_module/booking_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/employee/claim_history/claim_history.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/employee/dashboard/dashboard_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/employee/my_policy/my_policy_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/notification.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/whatsapp_screen.dart';
-
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/custom_appdrawer.dart';
 
 class MainScreen extends StatefulWidget {
   final int initialIndex;
+
   const MainScreen({super.key, this.initialIndex = 0});
 
   @override
@@ -30,9 +29,18 @@ class _MainScreenState extends State<MainScreen> {
     _controller = PersistentTabController(initialIndex: widget.initialIndex);
   }
 
+  BuildContext? tabContext;
+
   List<Widget> _buildScreens() {
     return [
-      DashboardScreen(scaffoldKey: _scaffoldKey),
+      DashboardScreen(
+        scaffoldKey: _scaffoldKey,
+        onReady: (ctx) {
+          setState(() {
+          tabContext = ctx;            
+          });
+        },
+      ),
       MyPolicyScreen(scaffoldKey: _scaffoldKey),
       WhatsappScreen(scaffoldKey: _scaffoldKey),
       ClaimHistoryScreen(scaffoldKey: _scaffoldKey),
@@ -100,7 +108,7 @@ class _MainScreenState extends State<MainScreen> {
       drawer: AppDrawer(
         scaffoldKey: _scaffoldKey,
         controller: _controller,
-        parentContext: context,
+        parentContext: tabContext ?? context,
       ),
       backgroundColor: Colors.white,
       body: PersistentTabView(

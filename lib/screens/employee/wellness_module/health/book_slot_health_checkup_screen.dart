@@ -32,8 +32,8 @@ class BookSlotHealthCheckUpScreen extends StatefulWidget {
 class _BookSlotHealthCheckUpScreenState
     extends State<BookSlotHealthCheckUpScreen> {
   final controllers = Get.put(StateController());
-  List<dynamic> testPackage = [];  
-  bool isLoading = true;  
+  List<dynamic> testPackage = [];
+  bool isLoading = true;
 
   void _showPackageDetailsBottomSheet(
     BuildContext context,
@@ -66,7 +66,6 @@ class _BookSlotHealthCheckUpScreenState
                   ),
                   child: Column(
                     children: [
-
                       Center(
                         child: Container(
                           height: 5,
@@ -98,13 +97,11 @@ class _BookSlotHealthCheckUpScreenState
                       ),
                       SizedBox(height: 10),
 
-
                       Expanded(
                         child: SingleChildScrollView(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              
                               Text(
                                 "Included Tests:",
                                 style: AppTextTheme.subTitle.copyWith(
@@ -271,7 +268,6 @@ class _BookSlotHealthCheckUpScreenState
           ),
           child: Column(
             children: [
-
               if (isLoading)
                 Center(
                   child: Padding(
@@ -279,7 +275,6 @@ class _BookSlotHealthCheckUpScreenState
                     child: CircularProgressIndicator(),
                   ),
                 )
-
               else if (testPackage.isEmpty)
                 Center(
                   child: Padding(
@@ -290,7 +285,6 @@ class _BookSlotHealthCheckUpScreenState
                     ),
                   ),
                 )
-
               else
                 ListView.builder(
                   shrinkWrap: true,
@@ -401,16 +395,16 @@ class _BookSlotHealthCheckUpScreenState
                                               item['items']?.toString() ?? '',
                                               style: AppTextTheme.paragraph,
                                               maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
+                                              //   overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
                                         ],
                                       ),
-                                    if ((test['itemsList']?.length ?? 0) > 2)
-                                      Text(
-                                        '...',
-                                        style: AppTextTheme.paragraph,
-                                      ),
+                                    // if ((test['itemsList']?.length ?? 0) > 2)
+                                    //   Text(
+                                    //     '...',
+                                    //     style: AppTextTheme.paragraph,
+                                    //   ),
                                   ],
                                 ),
                               ],
@@ -450,7 +444,7 @@ class _BookSlotHealthCheckUpScreenState
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                            const HealthCheckUpFormScreen(),
+                                            HealthCheckUpFormScreen(),
                                       ),
                                     );
                                   },

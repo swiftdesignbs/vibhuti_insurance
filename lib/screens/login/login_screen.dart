@@ -25,10 +25,16 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController companyCodeController = TextEditingController();
-  TextEditingController mobileController = TextEditingController();
-  TextEditingController emailIdController = TextEditingController();
-  TextEditingController employeeCodeController = TextEditingController();
+  TextEditingController companyCodeController = TextEditingController(
+    text: "ESTR",
+  );
+  TextEditingController mobileController = TextEditingController(text: "0");
+  TextEditingController emailIdController = TextEditingController(
+    text: "itsupport@vibhutiinsurance.in",
+  );
+  TextEditingController employeeCodeController = TextEditingController(
+    text: "1035",
+  );
   final controller = Get.put(StateController());
 
   bool showEmployeeCode = false;

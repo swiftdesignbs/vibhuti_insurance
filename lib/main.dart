@@ -17,14 +17,11 @@ import 'package:device_preview_plus/device_preview_plus.dart';
 //   // Initialize lifecycle
 //   final appLifecycleService = AppLifecycleService();
 //   appLifecycleService.init();
-
 //   /// REQUEST PERMISSIONS HERE
 //   await _askPermissions();
 //   await FlutterDownloader.initialize(debug: true, ignoreSsl: true);
-
 //   final controller = Get.put(StateController());
 //   await controller.initAuth();
-
 //   // ---- FORCE AUTO LOGOUT ON APP RESTART ----
 //   final token = await getAuthToken();
 //   if (token != null && token.toString().isNotEmpty) {

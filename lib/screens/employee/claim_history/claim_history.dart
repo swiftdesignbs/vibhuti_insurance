@@ -2,11 +2,16 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/employee/claim_history/claim_history_pt.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/employee/health_claims/create_claim/claims_screen.dart';
 import 'package:vibhuti_insurance_mobile_app/screens/employee/profile/profile_screen.dart';
+import 'package:vibhuti_insurance_mobile_app/screens/login/login_selection.dart';
+import 'package:vibhuti_insurance_mobile_app/state_management/state_management.dart';
+import 'package:vibhuti_insurance_mobile_app/utils/api_service.dart';
 import 'package:vibhuti_insurance_mobile_app/utils/app_text_theme.dart';
+import 'package:vibhuti_insurance_mobile_app/utils/constant.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/app_bar.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/claim_status_widget.dart';
 import 'package:vibhuti_insurance_mobile_app/widgets/custom_appdrawer.dart';
@@ -17,7 +22,7 @@ import 'package:vibhuti_insurance_mobile_app/widgets/regular_btn.dart';
 
 class ClaimHistoryScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
-
+  
   const ClaimHistoryScreen({super.key, required this.scaffoldKey});
 
   @override
@@ -26,6 +31,8 @@ class ClaimHistoryScreen extends StatefulWidget {
 
 class _ClaimHistoryScreenState extends State<ClaimHistoryScreen>
     with AutomaticKeepAliveClientMixin {
+  final controllers = Get.put(StateController());
+
   TextEditingController searchController = TextEditingController();
   TextEditingController patientName = TextEditingController();
   TextEditingController claimNo = TextEditingController();
@@ -33,6 +40,7 @@ class _ClaimHistoryScreenState extends State<ClaimHistoryScreen>
   String? selectedValue;
 
   TextEditingController dateController = TextEditingController();
+
   final List<Map<String, dynamic>> healthClaims = [
     {
       "policyName": "Health Shield Gold",
@@ -126,6 +134,10 @@ class _ClaimHistoryScreenState extends State<ClaimHistoryScreen>
     },
   ];
   String? selectedStatus;
+  String? selectedYearFilter;
+
+  String? selectedStartYear;
+  String? selectedEndYear;
 
   Widget statusClaimItem({
     required String title,
@@ -235,7 +247,7 @@ class _ClaimHistoryScreenState extends State<ClaimHistoryScreen>
         final screenHeight = MediaQuery.of(context).size.height;
         final sheetHeight = screenHeight > 700 ? 0.7 : 0.80;
 
-        int selectedTab = 0; // 0 = Year-Year, 1 = Status
+        int selectedTab = 0;
 
         return StatefulBuilder(
           builder: (context, setState) {
@@ -276,7 +288,6 @@ class _ClaimHistoryScreenState extends State<ClaimHistoryScreen>
                               ),
                               SizedBox(height: 20),
 
-                              /// ------------------ TAB BUTTONS -------------------
                               Row(
                                 children: [
                                   Expanded(
@@ -304,10 +315,18 @@ class _ClaimHistoryScreenState extends State<ClaimHistoryScreen>
                               ),
                               SizedBox(height: 20),
 
-                              /// ------------------ TAB CONTENT -------------------
                               Expanded(
                                 child: selectedTab == 0
-                                    ? _yearFilterView()
+                                    ? _yearFilterView(
+                                        onYearSelected: (year) {
+                                          setState(() {
+                                            selectedYearFilter = year.split(
+                                              " - ",
+                                            )[0];
+                                          });
+                                          fetchClaimHistory();
+                                        },
+                                      )
                                     : _statusFilterView(),
                               ),
                             ],
@@ -334,8 +353,83 @@ class _ClaimHistoryScreenState extends State<ClaimHistoryScreen>
     'In Law - 6',
   ];
   @override
-  bool get wantKeepAlive => true; // 👈 Prevents dispose() during tab switching
+  bool get wantKeepAlive => true;
+  var _claimHistory = [];
+  bool _isLoading = true;
+  bool _isEmpty = false;
 
+  Future<void> fetchClaimHistory() async {
+    setState(() {
+      _isLoading = true;
+      _isEmpty = false;
+    });
+
+    final token = controllers.authToken.toString();
+
+    if (token.trim().isEmpty) {
+      controllers.authUser.clear();
+      Get.offAll(() => LoginSelection());
+      return;
+    }
+
+    final String url = "$baseUrl/api/BCGModule/GetAllTPAClaimDetailsHistory";
+
+    try {
+      final body = {
+        "Action": "Get Details",
+        "Year": null,
+        "CompanyId": 129,
+        "PolicyName": "",
+        "EmployeeID": 99088,
+        "PageNumber": 1,
+        "PageSize": 10,
+        "Search": "",
+        "FromDate": selectedYearFilter != null
+            ? "$selectedYearFilter-12-31"
+            : null,
+        "ToDate": selectedYearFilter != null
+            ? "$selectedYearFilter-12-30"
+            : null,
+      };
+
+      final response = await ApiService.postRequest(
+        url: url,
+        body: body,
+        token: token,
+      );
+
+      if (response != null &&
+          response['Result'] != null &&
+          response['Result'] is List) {
+        final claimHistory = response['Result'];
+
+        setState(() {
+          _claimHistory = claimHistory;
+          _isEmpty = claimHistory.isEmpty;
+        });
+      } else {
+        setState(() {
+          _isEmpty = true;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isEmpty = true;
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchClaimHistory();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarUtils.buildCommonAppBar(
@@ -359,8 +453,8 @@ class _ClaimHistoryScreenState extends State<ClaimHistoryScreen>
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.1),
-                      offset: const Offset(4, 4), // X, Y offset
-                      blurRadius: 0, // No blur
+                      offset: const Offset(4, 4),  
+                      blurRadius: 0,  
                       spreadRadius: 0,
                     ),
                   ],
@@ -559,151 +653,215 @@ class _ClaimHistoryScreenState extends State<ClaimHistoryScreen>
               ),
 
             Expanded(
-              child: ListView.builder(
-                shrinkWrap: true,
-                physics: const AlwaysScrollableScrollPhysics(),
-                itemCount: healthClaims.length,
-                itemBuilder: (context, index) {
-                  final claim = healthClaims[index];
-                  return Container(
-                    margin: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(
-                        color: const Color(0xFF56B3AD),
-                        width: 1,
+              child: _isLoading
+                  ? Center(
+                      child: CircularProgressIndicator(
+                        color: AppTextTheme.primaryColor,
                       ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
+                    )
+                  : _isEmpty
+                  ? Center(
+                      child: Text(
+                        "No claim history found",
+                        style: AppTextTheme.subTitle,
+                      ),
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      itemCount: _claimHistory.length,
+                      itemBuilder: (context, index) {
+                        final claim = _claimHistory[index];
+                        return Container(
+                          margin: const EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(25),
+                            border: Border.all(
+                              color: const Color(0xFF56B3AD),
+                              width: 1,
+                            ),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: Column(
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          claim['policyName'],
-                                          style: AppTextTheme.paragraph,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                claim['PolicyName'],
+                                                style: AppTextTheme.paragraph,
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              const SizedBox(height: 2),
+                                              Text(
+                                                claim['EmployeeName'],
+                                                style: AppTextTheme.subTitle,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          claim['customerName'],
-                                          style: AppTextTheme.subTitle,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
+                                        const SizedBox(width: 12),
+
+                                        Column(
+                                          children: [
+                                            Text(
+                                              "Status",
+                                              style: AppTextTheme.subItemTitle,
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                color: _getStatusColor(
+                                                  claim['CLAIM_STATUS'],
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                              ),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 6,
+                                                    ),
+                                                child: Text(
+                                                  claim['CLAIM_STATUS'],
+                                                  style: AppTextTheme.paragraph
+                                                      .copyWith(
+                                                        color: Colors.white,
+                                                        // color: _getStatusColor(
+                                                        //   claim['status'],
+                                                        // ),
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
-                                  ),
-                                  const SizedBox(width: 12),
 
-                                  Column(
-                                    children: [
-                                      Text(
-                                        "Status",
-                                        style: AppTextTheme.subItemTitle,
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: _getStatusColor(
-                                            claim['status'],
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            15,
+                                    const SizedBox(height: 12),
+
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: Color(
+                                                0xffD8E9F1,
+                                              ).withOpacity(0.7),
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(
+                                                5.0,
+                                              ),
+                                              child: Text(
+                                                "Claim No: ${claim['TPA_CLAIM_NO']}",
+                                                textAlign: TextAlign.center,
+                                                style: AppTextTheme.paragraph
+                                                    .copyWith(
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: Color(0xff00635F),
+                                                    ),
+                                              ),
+                                            ),
                                           ),
                                         ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 6,
-                                          ),
-                                          child: Text(
-                                            claim['status'],
-                                            style: AppTextTheme.paragraph
-                                                .copyWith(
-                                                  color: Colors.white,
-                                                  // color: _getStatusColor(
-                                                  //   claim['status'],
-                                                  // ),
-                                                  fontWeight: FontWeight.bold,
-                                                ),
+                                        const SizedBox(width: 12),
+
+                                        Expanded(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: Color(
+                                                0xffD8E9F1,
+                                              ).withOpacity(0.7),
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(
+                                                5.0,
+                                              ),
+                                              child: Text(
+                                                "Created On: ${claim['COMMENCEMENT_DATE']}",
+                                                textAlign: TextAlign.center,
+
+                                                style: AppTextTheme.paragraph
+                                                    .copyWith(
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: Color(0xff00635F),
+                                                    ),
+                                              ),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
 
-                              const SizedBox(height: 12),
-
+                              // Buttons row
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Expanded(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Color(
-                                          0xffD8E9F1,
-                                        ).withOpacity(0.7),
-                                        borderRadius: BorderRadius.circular(15),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(5.0),
-                                        child: Text(
-                                          "Claim No: ${claim['claimNo']}",
-                                          textAlign: TextAlign.center,
-                                          style: AppTextTheme.paragraph
-                                              .copyWith(
-                                                fontWeight: FontWeight.w700,
-                                                color: Color(0xff00635F),
-                                              ),
+                                    child: InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ClaimHistoryPt1(
+                                                  claimDetails: claim,
+                                                ),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        height: 45,
+                                        decoration: BoxDecoration(
+                                          color: Color(0xFF00B3AC),
+                                          borderRadius: const BorderRadius.only(
+                                            bottomRight: Radius.circular(20),
+                                            bottomLeft: Radius.circular(20),
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-
-                                  Expanded(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Color(
-                                          0xffD8E9F1,
-                                        ).withOpacity(0.7),
-                                        borderRadius: BorderRadius.circular(15),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(5.0),
-                                        child: Text(
-                                          "Created On: ${claim['date']}",
-                                          textAlign: TextAlign.center,
-
-                                          style: AppTextTheme.paragraph
-                                              .copyWith(
-                                                fontWeight: FontWeight.w700,
-                                                color: Color(0xff00635F),
-                                              ),
+                                        child: Center(
+                                          child: Text(
+                                            'View Details',
+                                            style: AppTextTheme.buttonText,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -712,46 +870,9 @@ class _ClaimHistoryScreenState extends State<ClaimHistoryScreen>
                               ),
                             ],
                           ),
-                        ),
-
-                        // Buttons row
-                        Row(
-                          children: [
-                            Expanded(
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ClaimHistoryPt1(),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  height: 45,
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFF00B3AC),
-                                    borderRadius: const BorderRadius.only(
-                                      bottomRight: Radius.circular(20),
-                                      bottomLeft: Radius.circular(20),
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      'View Details',
-                                      style: AppTextTheme.buttonText,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
           ],
         ),
@@ -791,18 +912,20 @@ Color _getStatusColor(String status) {
       return const Color(0xFFFF4242); // Red
     case 'In Progress':
       return const Color(0xFF826E5D); // Brownish
+    case 'Approved':
+      return const Color.fromARGB(255, 199, 97, 7); // Brownish
     default:
       return Colors.grey;
   }
 }
 
-Widget _yearFilterView() {
+Widget _yearFilterView({required Function(String) onYearSelected}) {
   final List<String> yearList = [
-    "2019 - 2020",
-    "2020 - 2021",
-    "2021 - 2022",
-    "2022 - 2023",
+    "2024 - 2025",
     "2023 - 2024",
+    "2022 - 2023",
+    "2021 - 2022",
+    "2020 - 2021",
   ];
 
   String? selectedYear;
@@ -821,7 +944,8 @@ Widget _yearFilterView() {
             groupValue: selectedYear,
             onChanged: (value) {
               setState(() => selectedYear = value);
-              Navigator.pop(context, value);
+              onYearSelected(value!);
+              Navigator.pop(context);
             },
           );
         },
